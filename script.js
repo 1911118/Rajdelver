@@ -42,47 +42,6 @@ const cartItemsContainer = document.getElementById('cartItems');
 const cartTotalElement = document.getElementById('cartTotal');
 const orderForm = document.getElementById('orderForm');
 
-// Tutorial State
-let currentStep = 0;
-const tutorialSteps = [
-    {
-        title: "Welcome to Delvery!",
-        content: "Let's take a quick tour of how to use our website to order delicious food.",
-        target: null,
-        icon: "fas fa-utensils"
-    },
-    {
-        title: "Browse Our Menu",
-        content: "Scroll down to see our delicious menu items. Each item shows its description and price.",
-        target: "#menu",
-        icon: "fas fa-list"
-    },
-    {
-        title: "Select Your Items",
-        content: "Use the + and - buttons to select the quantity of each item you want to order.",
-        target: ".quantity-selector",
-        icon: "fas fa-plus-minus"
-    },
-    {
-        title: "Add to Cart",
-        content: "Click the 'Add to Cart' button to add your selected items to your cart.",
-        target: ".menu-item .btn-primary",
-        icon: "fas fa-cart-plus"
-    },
-    {
-        title: "View Your Cart",
-        content: "Click the cart icon in the top right to view your selected items and total.",
-        target: "#cartBtn",
-        icon: "fas fa-shopping-cart"
-    },
-    {
-        title: "Place Your Order",
-        content: "Fill in your details and click 'Place Order' to send your order via WhatsApp.",
-        target: "#orderForm",
-        icon: "fas fa-paper-plane"
-    }
-];
-
 // Location State
 let currentLocation = null;
 
@@ -252,229 +211,67 @@ function sendWhatsAppOrder() {
     message += `Door/Apt: ${doorNumber}\n`;
     if (landmark) message += `Landmark: ${landmark}\n`;
     if (deliveryInstructions) message += `Instructions: ${deliveryInstructions}\n`;
-    
     if (currentLocation) {
-        message += `\nLocation:\n`;
-        message += `Latitude: ${currentLocation.latitude}\n`;
-        message += `Longitude: ${currentLocation.longitude}\n`;
-        message += `Google Maps: https://www.google.com/maps?q=${currentLocation.latitude},${currentLocation.longitude}\n`;
+        message += `\nLocation: https://www.google.com/maps?q=${currentLocation.latitude},${currentLocation.longitude}\n`;
     }
+    message += `\nOrder Details:\n${orderDetails}\n\n`;
+    message += `Total Amount: ₹${total}`;
     
-    message += `\nItems Ordered:\n${orderDetails}\n\n`;
-    message += `Total: ₹${total}`;
-    
-    const whatsappUrl = `https://wa.me/7569226048?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/917569226048?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
 }
 
-// Toast Notification
 function showToast(message) {
     const toast = document.createElement('div');
-    toast.className = 'toast position-fixed bottom-0 end-0 m-3';
-    toast.setAttribute('role', 'alert');
-    toast.setAttribute('aria-live', 'assertive');
-    toast.setAttribute('aria-atomic', 'true');
-    
+    toast.className = 'toast';
     toast.innerHTML = `
-        <div class="toast-header">
-            <strong class="me-auto">Notification</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
-        </div>
         <div class="toast-body">
             ${message}
         </div>
     `;
-    
     document.body.appendChild(toast);
-    const bsToast = new bootstrap.Toast(toast);
-    bsToast.show();
     
-    toast.addEventListener('hidden.bs.toast', () => {
-        toast.remove();
-    });
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 100);
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 300);
+    }, 3000);
+}
+
+function buyNow(id) {
+    const quantity = parseInt(document.getElementById(`quantity-${id}`).textContent);
+    if (quantity > 0) {
+        cart = [{
+            ...menuItems.find(item => item.id === id),
+            quantity: quantity
+        }];
+        updateCartCount();
+        updateCartDisplay();
+        toggleCart();
+    }
 }
 
 // Event Listeners
-cartBtn.addEventListener('click', () => {
-    updateCartDisplay();
-    toggleCart();
-});
-
-closeCartBtn.addEventListener('click', closeCart);
-
-// Close cart when clicking outside (mobile only)
-document.addEventListener('click', (e) => {
-    if (window.innerWidth <= 768 && 
-        cartPanel.classList.contains('active') && 
-        !cartPanel.contains(e.target) && 
-        !cartBtn.contains(e.target)) {
-        closeCart();
-    }
-});
-
-// Update cart display on window resize
-window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) {
-        cartPanel.classList.remove('active');
-        document.body.classList.remove('cart-open');
-    }
-});
-
-orderForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (cart.length === 0) {
-        showToast('Your cart is empty!');
-        return;
-    }
-    sendWhatsAppOrder();
-    cart = [];
-    updateCartCount();
-    closeCart();
-    orderForm.reset();
-});
-
-// Tutorial Functions
-function initializeTutorial() {
-    const hasSeenTutorial = localStorage.getItem('hasSeenTutorial');
-    if (!hasSeenTutorial) {
-        showTutorial();
-    }
-}
-
-function showTutorial() {
-    currentStep = 0;
-    const tutorialModal = new bootstrap.Modal(document.getElementById('tutorialModal'));
-    tutorialModal.show();
-    updateTutorialStep();
-}
-
-function updateTutorialStep() {
-    const step = tutorialSteps[currentStep];
-    const tutorialStepsContainer = document.getElementById('tutorialSteps');
-    const prevButton = document.getElementById('prevStep');
-    const nextButton = document.getElementById('nextStep');
-    const finishButton = document.getElementById('finishTutorial');
-
-    // Update content
-    tutorialStepsContainer.innerHTML = `
-        <div class="text-center">
-            <div class="tutorial-icon mb-3">
-                <i class="${step.icon} fa-3x"></i>
-            </div>
-            <h4>${step.title}</h4>
-            <p class="lead">${step.content}</p>
-            <div class="tutorial-progress mb-3">
-                Step ${currentStep + 1} of ${tutorialSteps.length}
-            </div>
-            ${step.target ? `<div class="tutorial-highlight" data-target="${step.target}"></div>` : ''}
-        </div>
-    `;
-
-    // Update buttons
-    prevButton.style.display = currentStep > 0 ? 'block' : 'none';
-    nextButton.style.display = currentStep < tutorialSteps.length - 1 ? 'block' : 'none';
-    finishButton.style.display = currentStep === tutorialSteps.length - 1 ? 'block' : 'none';
-
-    // Highlight target element if exists
-    if (step.target) {
-        const targetElement = document.querySelector(step.target);
-        if (targetElement) {
-            targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // Add a pulsing effect to the target element
-            targetElement.classList.add('tutorial-pulse');
-        }
-    }
-}
-
-function nextStep() {
-    if (currentStep < tutorialSteps.length - 1) {
-        currentStep++;
-        updateTutorialStep();
-    }
-}
-
-function prevStep() {
-    if (currentStep > 0) {
-        currentStep--;
-        updateTutorialStep();
-    }
-}
-
-function finishTutorial() {
-    localStorage.setItem('hasSeenTutorial', 'true');
-    const tutorialModal = bootstrap.Modal.getInstance(document.getElementById('tutorialModal'));
-    tutorialModal.hide();
-    showToast('Tutorial completed! You can view it again anytime by clicking "How to Use" in the menu.');
-}
-
-// Add tutorial event listeners
 document.addEventListener('DOMContentLoaded', () => {
     initializeMenu();
-    updateCartCount();
-    initializeTutorial();
-
-    // Show admin link if user is admin
-    if (localStorage.getItem('isAdmin') === 'true') {
-        document.getElementById('adminNavItem').style.display = 'block';
-    }
-
-    // Tutorial button event listeners
-    document.getElementById('nextStep').addEventListener('click', nextStep);
-    document.getElementById('prevStep').addEventListener('click', prevStep);
-    document.getElementById('finishTutorial').addEventListener('click', finishTutorial);
-    document.getElementById('showTutorialBtn').addEventListener('click', (e) => {
+    cartBtn.addEventListener('click', toggleCart);
+    closeCartBtn.addEventListener('click', closeCart);
+    orderForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        showTutorial();
+        sendWhatsAppOrder();
     });
-
-    // Location checkbox event listener
-    document.getElementById('useCurrentLocation').addEventListener('change', (e) => {
-        if (e.target.checked) {
-            getCurrentLocation();
-        } else {
-            currentLocation = null;
-            document.getElementById('locationStatus').innerHTML = '';
-        }
-    });
-});
-
-// Buy Now Function
-function buyNow(id) {
-    const quantity = parseInt(document.getElementById(`quantity-${id}`).textContent) || 0;
-    if (quantity === 0) {
-        showToast('Please select quantity first!');
-        return;
+    
+    const useCurrentLocationCheckbox = document.getElementById('useCurrentLocation');
+    if (useCurrentLocationCheckbox) {
+        useCurrentLocationCheckbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                getCurrentLocation();
+            }
+        });
     }
-
-    const item = menuItems.find(item => item.id === id);
-    if (item) {
-        // Add item to cart with selected quantity
-        const existingItem = cart.find(cartItem => cartItem.id === id);
-        if (existingItem) {
-            existingItem.quantity = quantity; // Use selected quantity
-        } else {
-            cart.push({
-                ...item,
-                quantity: quantity
-            });
-        }
-        
-        // Update cart count and display
-        updateCartCount();
-        updateCartDisplay();
-        
-        // Show cart panel
-        toggleCart();
-        
-        // Show success message
-        showToast('Item added to cart!');
-        
-        // Reset quantity
-        document.getElementById(`quantity-${id}`).textContent = '0';
-        const buyNowBtn = document.getElementById(`buyNowBtn-${id}`);
-        if (buyNowBtn) {
-            buyNowBtn.disabled = true;
-            buyNowBtn.style.opacity = '0.6';
-        }
-    }
-} 
+}); 
