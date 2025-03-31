@@ -31,7 +31,7 @@ const menuItems = JSON.parse(localStorage.getItem('menuItems')) || [
 ];
 
 // Cart State
-let cart = [];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
 // DOM Elements
 const menuContainer = document.getElementById('menuItems');
@@ -84,8 +84,8 @@ function initializeMenu() {
                         <span class="mx-2" id="quantity-${item.id}">0</span>
                         <button class="btn btn-sm btn-outline-primary" onclick="updateQuantity(${item.id}, 1)">+</button>
                     </div>
-                    <button class="btn btn-primary" onclick="buyNow(${item.id})" id="buyNowBtn-${item.id}">
-                        <i class="fas fa-shopping-cart"></i> Buy Now
+                    <button class="btn btn-primary" onclick="addToCart(${item.id})" id="addToCartBtn-${item.id}">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
                     </button>
                 </div>
             </div>
@@ -100,29 +100,17 @@ function updateQuantity(itemId, change) {
     const newQuantity = Math.max(0, currentQuantity + change);
     quantitySpan.textContent = newQuantity;
     
-    // Update Buy Now button state
-    const buyNowBtn = document.getElementById(`buyNowBtn-${itemId}`);
-    if (buyNowBtn) {
-        buyNowBtn.disabled = newQuantity === 0;
-        buyNowBtn.style.opacity = newQuantity === 0 ? '0.6' : '1';
+    // Update Add to Cart button state
+    const addToCartBtn = document.getElementById(`addToCartBtn-${itemId}`);
+    if (addToCartBtn) {
+        addToCartBtn.disabled = newQuantity === 0;
+        addToCartBtn.style.opacity = newQuantity === 0 ? '0.6' : '1';
     }
 }
 
 // Cart Functions
-function incrementQuantity(itemId) {
-    const input = document.getElementById(`quantity-${itemId}`);
-    input.value = parseInt(input.value) + 1;
-}
-
-function decrementQuantity(itemId) {
-    const input = document.getElementById(`quantity-${itemId}`);
-    if (parseInt(input.value) > 0) {
-        input.value = parseInt(input.value) - 1;
-    }
-}
-
 function addToCart(itemId) {
-    const quantity = parseInt(document.getElementById(`quantity-${itemId}`).value);
+    const quantity = parseInt(document.getElementById(`quantity-${itemId}`).textContent);
     if (quantity > 0) {
         const item = menuItems.find(item => item.id === itemId);
         const cartItem = cart.find(item => item.id === itemId);
@@ -136,8 +124,20 @@ function addToCart(itemId) {
             });
         }
         
+        // Save cart to localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+        
         updateCartCount();
+        updateCartDisplay();
         showToast('Item added to cart!');
+        
+        // Reset quantity
+        document.getElementById(`quantity-${itemId}`).textContent = '0';
+        const addToCartBtn = document.getElementById(`addToCartBtn-${itemId}`);
+        if (addToCartBtn) {
+            addToCartBtn.disabled = true;
+            addToCartBtn.style.opacity = '0.6';
+        }
     }
 }
 
@@ -153,9 +153,14 @@ function updateCartDisplay() {
                 <h6>${item.name}</h6>
                 <small>₹${item.price} x ${item.quantity}</small>
             </div>
-            <button class="btn btn-sm btn-danger" onclick="removeFromCart(${item.id})">
-                <i class="fas fa-trash"></i>
-            </button>
+            <div class="d-flex align-items-center">
+                <button class="btn btn-sm btn-outline-primary me-2" onclick="updateCartQuantity(${item.id}, -1)">-</button>
+                <span>${item.quantity}</span>
+                <button class="btn btn-sm btn-outline-primary ms-2" onclick="updateCartQuantity(${item.id}, 1)">+</button>
+                <button class="btn btn-sm btn-danger ms-2" onclick="removeFromCart(${item.id})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
         </div>
     `).join('');
     
@@ -163,8 +168,23 @@ function updateCartDisplay() {
     cartTotalElement.textContent = total;
 }
 
+function updateCartQuantity(itemId, change) {
+    const cartItem = cart.find(item => item.id === itemId);
+    if (cartItem) {
+        cartItem.quantity = Math.max(0, cartItem.quantity + change);
+        if (cartItem.quantity === 0) {
+            removeFromCart(itemId);
+        } else {
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            updateCartDisplay();
+        }
+    }
+}
+
 function removeFromCart(itemId) {
     cart = cart.filter(item => item.id !== itemId);
+    localStorage.setItem('cart', JSON.stringify(cart));
     updateCartCount();
     updateCartDisplay();
 }
@@ -243,27 +263,27 @@ function showToast(message) {
     }, 3000);
 }
 
-function buyNow(id) {
-    const quantity = parseInt(document.getElementById(`quantity-${id}`).textContent);
-    if (quantity > 0) {
-        cart = [{
-            ...menuItems.find(item => item.id === id),
-            quantity: quantity
-        }];
-        updateCartCount();
-        updateCartDisplay();
-        toggleCart();
-    }
-}
-
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
     initializeMenu();
+    updateCartCount();
+    updateCartDisplay();
+    
     cartBtn.addEventListener('click', toggleCart);
     closeCartBtn.addEventListener('click', closeCart);
+    
     orderForm.addEventListener('submit', (e) => {
         e.preventDefault();
+        if (cart.length === 0) {
+            showToast('Your cart is empty!');
+            return;
+        }
         sendWhatsAppOrder();
+        cart = [];
+        localStorage.removeItem('cart');
+        updateCartCount();
+        closeCart();
+        orderForm.reset();
     });
     
     const useCurrentLocationCheckbox = document.getElementById('useCurrentLocation');
@@ -271,6 +291,9 @@ document.addEventListener('DOMContentLoaded', () => {
         useCurrentLocationCheckbox.addEventListener('change', (e) => {
             if (e.target.checked) {
                 getCurrentLocation();
+            } else {
+                currentLocation = null;
+                document.getElementById('locationStatus').innerHTML = '';
             }
         });
     }
