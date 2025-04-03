@@ -1,151 +1,49 @@
-// Menu Items Data
-const menuItems = JSON.parse(localStorage.getItem('menuItems')) || [
-    {
-        id: 1,
-        name: "Margherita Pizza",
-        description: "Classic tomato sauce with mozzarella cheese and fresh basil",
-        price: 299,
-        image: "https://images.unsplash.com/photo-1604382355076-af4b0eb60143?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-    },
-    {
-        id: 2,
-        name: "Chicken Burger",
-        description: "Grilled chicken patty with lettuce, tomato, and special sauce",
-        price: 199,
-        image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-    },
-    {
-        id: 3,
-        name: "Pasta Alfredo",
-        description: "Creamy Alfredo sauce with fettuccine pasta and parmesan cheese",
-        price: 249,
-        image: "https://images.unsplash.com/photo-1645112411341-6c1f3c1c5c4f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-    },
-    {
-        id: 4,
-        name: "Chicken Wings",
-        description: "Crispy chicken wings with your choice of sauce",
-        price: 399,
-        image: "https://images.unsplash.com/photo-1527477396000-e27163b481c2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-    }
-];
-
-// Cart State
-let cart = [];
+// Get menu items from localStorage
+let menuItems = JSON.parse(localStorage.getItem('menuItems')) || [];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let orderId = 1;
 
 // DOM Elements
-const menuContainer = document.getElementById('menuItems');
+const menuItemsContainer = document.getElementById('menuItems');
 const cartBtn = document.getElementById('cartBtn');
 const cartPanel = document.getElementById('cartPanel');
 const closeCartBtn = document.getElementById('closeCart');
-const cartItemsContainer = document.getElementById('cartItems');
-const cartTotalElement = document.getElementById('cartTotal');
+const cartItems = document.getElementById('cartItems');
+const cartTotal = document.getElementById('cartTotal');
+const cartCount = document.getElementById('cartCount');
 const orderForm = document.getElementById('orderForm');
-
-// Tutorial State
-let currentStep = 0;
-const tutorialSteps = [
-    {
-        title: "Welcome to Delvery!",
-        content: "Let's take a quick tour of how to use our website to order delicious food.",
-        target: null,
-        icon: "fas fa-utensils"
-    },
-    {
-        title: "Browse Our Menu",
-        content: "Scroll down to see our delicious menu items. Each item shows its description and price.",
-        target: "#menu",
-        icon: "fas fa-list"
-    },
-    {
-        title: "Select Your Items",
-        content: "Use the + and - buttons to select the quantity of each item you want to order.",
-        target: ".quantity-selector",
-        icon: "fas fa-plus-minus"
-    },
-    {
-        title: "Add to Cart",
-        content: "Click the 'Add to Cart' button to add your selected items to your cart.",
-        target: ".menu-item .btn-primary",
-        icon: "fas fa-cart-plus"
-    },
-    {
-        title: "View Your Cart",
-        content: "Click the cart icon in the top right to view your selected items and total.",
-        target: "#cartBtn",
-        icon: "fas fa-shopping-cart"
-    },
-    {
-        title: "Place Your Order",
-        content: "Fill in your details and click 'Place Order' to send your order via WhatsApp.",
-        target: "#orderForm",
-        icon: "fas fa-paper-plane"
-    }
-];
-
-// Location State
-let currentLocation = null;
-
-// Location Functions
-function getCurrentLocation() {
+const showTutorialBtn = document.getElementById('showTutorialBtn');
+const tutorialModal = new bootstrap.Modal(document.getElementById('tutorialModal'));
+const useCurrentLocation = document.getElementById('useCurrentLocation');
     const locationStatus = document.getElementById('locationStatus');
-    locationStatus.innerHTML = '<div class="text-primary"><i class="fas fa-spinner fa-spin"></i> Getting your location...</div>';
-    
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                currentLocation = {
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude
-                };
-                locationStatus.innerHTML = '<div class="text-success"><i class="fas fa-check-circle"></i> Location captured successfully!</div>';
-            },
-            (error) => {
-                locationStatus.innerHTML = '<div class="text-danger"><i class="fas fa-exclamation-circle"></i> Error getting location. Please enter address manually.</div>';
-                console.error('Error getting location:', error);
-            }
-        );
-    } else {
-        locationStatus.innerHTML = '<div class="text-danger"><i class="fas fa-exclamation-circle"></i> Geolocation is not supported by your browser.</div>';
-    }
+const searchInput = document.getElementById('searchInput');
+const searchButton = document.getElementById('searchButton');
+
+// Initialize the page
+function initializePage() {
+    displayMenuItems();
+    updateCart();
+    setupEventListeners();
 }
 
-// Search Functionality
-function filterProducts(searchTerm) {
-    const filteredItems = menuItems.filter(item => 
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    
-    displayFilteredProducts(filteredItems);
-}
-
-function displayFilteredProducts(items) {
-    if (items.length === 0) {
-        menuContainer.innerHTML = `
-            <div class="col-12 no-results">
-                <i class="fas fa-search"></i>
-                <p>No products found matching your search.</p>
-            </div>
-        `;
-        return;
-    }
-
-    menuContainer.innerHTML = items.map(item => `
-        <div class="col-md-4 mb-4">
-            <div class="menu-item">
-                <img src="${item.image}" alt="${item.name}">
-                <h3>${item.name}</h3>
-                <p>${item.description}</p>
-                <div class="price">₹${item.price}</div>
-                <div class="d-flex justify-content-between align-items-center">
+// Display menu items
+function displayMenuItems(filteredItems = null) {
+    const items = filteredItems || menuItems;
+    menuItemsContainer.innerHTML = items.map(item => `
+        <div class="col-md-3 mb-4">
+            <div class="product-card">
+                <img src="${item.image}" class="product-image" alt="${item.name}">
+                <div class="product-details">
+                    <h3 class="product-title">${item.name}</h3>
+                    <p class="product-description">${item.description}</p>
+                    <div class="product-price">₹${item.price}</div>
                     <div class="quantity-controls">
-                        <button class="btn btn-sm btn-outline-primary" onclick="updateQuantity(${item.id}, -1)">-</button>
-                        <span class="mx-2" id="quantity-${item.id}">0</span>
-                        <button class="btn btn-sm btn-outline-primary" onclick="updateQuantity(${item.id}, 1)">+</button>
+                        <button onclick="updateQuantity(${item.id}, (getCartItemQuantity(${item.id}) - 1))">-</button>
+                        <input type="number" value="${getCartItemQuantity(item.id)}" min="0" readonly>
+                        <button onclick="updateQuantity(${item.id}, (getCartItemQuantity(${item.id}) + 1))">+</button>
                     </div>
-                    <button class="btn btn-primary" onclick="buyNow(${item.id})" id="buyNowBtn-${item.id}">
-                        <i class="fas fa-shopping-cart"></i> Buy Now
+                    <button class="btn btn-primary w-100" onclick="addToCart(${item.id})">
+                        Add to Cart
                     </button>
                 </div>
             </div>
@@ -153,166 +51,263 @@ function displayFilteredProducts(items) {
     `).join('');
 }
 
-// Event Listeners for Search
-document.getElementById('searchInput').addEventListener('input', (e) => {
-    filterProducts(e.target.value);
-});
-
-document.getElementById('searchButton').addEventListener('click', () => {
-    const searchTerm = document.getElementById('searchInput').value;
-    filterProducts(searchTerm);
-});
-
-// Initialize Menu
-function initializeMenu() {
-    displayFilteredProducts(menuItems);
+// Get cart item quantity
+function getCartItemQuantity(itemId) {
+    const cartItem = cart.find(item => item.id === itemId);
+    return cartItem ? cartItem.quantity : 0;
 }
 
-// Update quantity function
-function updateQuantity(itemId, change) {
-    const quantitySpan = document.getElementById(`quantity-${itemId}`);
-    const currentQuantity = parseInt(quantitySpan.textContent) || 0;
-    const newQuantity = Math.max(0, currentQuantity + change);
-    quantitySpan.textContent = newQuantity;
+// Search functionality
+function searchProducts() {
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    if (searchTerm === '') {
+        displayMenuItems();
+        return;
+    }
+
+    const filteredItems = menuItems.filter(item => 
+        item.name.toLowerCase().includes(searchTerm) ||
+        item.description.toLowerCase().includes(searchTerm)
+    );
     
-    // Update Buy Now button state
-    const buyNowBtn = document.getElementById(`buyNowBtn-${itemId}`);
-    if (buyNowBtn) {
-        buyNowBtn.disabled = newQuantity === 0;
-        buyNowBtn.style.opacity = newQuantity === 0 ? '0.6' : '1';
-    }
+    displayMenuItems(filteredItems);
 }
 
-// Cart Functions
-function incrementQuantity(itemId) {
-    const input = document.getElementById(`quantity-${itemId}`);
-    input.value = parseInt(input.value) + 1;
-}
-
-function decrementQuantity(itemId) {
-    const input = document.getElementById(`quantity-${itemId}`);
-    if (parseInt(input.value) > 0) {
-        input.value = parseInt(input.value) - 1;
-    }
-}
-
+// Add item to cart
 function addToCart(itemId) {
-    const quantity = parseInt(document.getElementById(`quantity-${itemId}`).value);
-    if (quantity > 0) {
         const item = menuItems.find(item => item.id === itemId);
-        const cartItem = cart.find(item => item.id === itemId);
-        
+    if (item) {
+        const cartItem = cart.find(cartItem => cartItem.id === itemId);
         if (cartItem) {
-            cartItem.quantity += quantity;
+            cartItem.quantity++;
         } else {
-            cart.push({
-                ...item,
-                quantity: quantity
-            });
+            cart.push({ ...item, quantity: 1 });
         }
-        
-        updateCartCount();
+        updateCart();
         showToast('Item added to cart!');
     }
 }
 
-function updateCartCount() {
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    document.getElementById('cartCount').textContent = totalItems;
-}
-
-function updateCartDisplay() {
-    cartItemsContainer.innerHTML = cart.map(item => `
+// Update cart display
+function updateCart() {
+    // Update cart items
+    cartItems.innerHTML = cart.map(item => `
         <div class="cart-item">
-            <div>
+            <div class="row align-items-center">
+                <div class="col-8">
                 <h6>${item.name}</h6>
-                <small>₹${item.price} x ${item.quantity}</small>
+                    <p class="mb-0">₹${item.price} x ${item.quantity}</p>
+                </div>
+                <div class="col-4 text-end">
+                    <button class="btn btn-sm btn-outline-primary" onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
+                    <button class="btn btn-sm btn-outline-primary" onclick="updateQuantity(${item.id}, ${item.quantity - 1})">-</button>
+                </div>
             </div>
-            <button class="btn btn-sm btn-danger" onclick="removeFromCart(${item.id})">
-                <i class="fas fa-trash"></i>
-            </button>
         </div>
     `).join('');
     
+    // Update cart total
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    cartTotalElement.textContent = total;
+    cartTotal.textContent = total;
+
+    // Update cart count
+    const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+    cartCount.textContent = count;
+
+    // Save cart to localStorage
+    localStorage.setItem('cart', JSON.stringify(cart));
+
+    // Update quantity inputs in menu
+    displayMenuItems();
 }
 
-function removeFromCart(itemId) {
+// Update item quantity in cart
+function updateQuantity(itemId, newQuantity) {
+    if (newQuantity <= 0) {
     cart = cart.filter(item => item.id !== itemId);
-    updateCartCount();
-    updateCartDisplay();
-}
-
-function toggleCart() {
-    // On mobile, toggle the cart visibility
-    if (window.innerWidth <= 768) {
-        cartPanel.classList.toggle('active');
-        document.body.classList.toggle('cart-open');
+    } else {
+        const item = cart.find(item => item.id === itemId);
+        if (item) {
+            item.quantity = newQuantity;
+        } else {
+            const menuItem = menuItems.find(item => item.id === itemId);
+            if (menuItem) {
+                cart.push({ ...menuItem, quantity: newQuantity });
+            }
+        }
     }
+    updateCart();
 }
 
-function closeCart() {
-    // Only close on mobile
-    if (window.innerWidth <= 768) {
+// Setup event listeners
+function setupEventListeners() {
+    // Cart button click
+    cartBtn.addEventListener('click', () => {
+        cartPanel.classList.add('active');
+    });
+
+    // Close cart button click
+    closeCartBtn.addEventListener('click', () => {
         cartPanel.classList.remove('active');
-        document.body.classList.remove('cart-open');
+    });
+
+    // Order form submission
+    orderForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        placeOrder();
+    });
+
+    // Tutorial button click
+    showTutorialBtn.addEventListener('click', () => {
+        showTutorial();
+    });
+
+    // Current location checkbox
+    useCurrentLocation.addEventListener('change', () => {
+        if (useCurrentLocation.checked) {
+            getCurrentLocation();
+        } else {
+            locationStatus.textContent = '';
+        }
+    });
+
+    // Search functionality
+    searchInput.addEventListener('input', searchProducts);
+    searchButton.addEventListener('click', searchProducts);
+}
+
+// Place order
+function placeOrder() {
+    if (cart.length === 0) {
+        showToast('Your cart is empty!', 'warning');
+        return;
+    }
+
+    const order = {
+        id: orderId++,
+        items: cart,
+        total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+        customerName: document.getElementById('customerName').value,
+        customerPhone: document.getElementById('customerPhone').value,
+        customerEmail: document.getElementById('customerEmail').value,
+        deliveryAddress: document.getElementById('deliveryAddress').value,
+        doorNumber: document.getElementById('doorNumber').value,
+        landmark: document.getElementById('landmark').value,
+        deliveryInstructions: document.getElementById('deliveryInstructions').value,
+        status: 'Pending',
+        date: new Date().toISOString()
+    };
+
+    // Get orders from localStorage
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    orders.push(order);
+    localStorage.setItem('orders', JSON.stringify(orders));
+
+    // Clear cart
+    cart = [];
+    updateCart();
+    cartPanel.classList.remove('active');
+    orderForm.reset();
+
+    showToast('Order placed successfully!', 'success');
+}
+
+// Get current location
+function getCurrentLocation() {
+    if (navigator.geolocation) {
+        locationStatus.textContent = 'Getting location...';
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                // In a real application, you would use a geocoding service to get the address
+                document.getElementById('deliveryAddress').value = `${latitude}, ${longitude}`;
+                locationStatus.textContent = 'Location obtained successfully!';
+            },
+            (error) => {
+                locationStatus.textContent = 'Error getting location: ' + error.message;
+            }
+        );
+    } else {
+        locationStatus.textContent = 'Geolocation is not supported by your browser';
     }
 }
 
-// WhatsApp Integration
-function sendWhatsAppOrder() {
-    const customerName = document.getElementById('customerName').value;
-    const customerPhone = document.getElementById('customerPhone').value;
-    const customerEmail = document.getElementById('customerEmail').value;
-    const deliveryAddress = document.getElementById('deliveryAddress').value;
-    const doorNumber = document.getElementById('doorNumber').value;
-    const landmark = document.getElementById('landmark').value;
-    const deliveryInstructions = document.getElementById('deliveryInstructions').value;
-    
-    const orderDetails = cart.map(item => 
-        `${item.name} x ${item.quantity} @ ₹${item.price}`
-    ).join('\n');
-    
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
-    let message = `New Order Received:\n\n`;
-    message += `Customer Details:\n`;
-    message += `Name: ${customerName}\n`;
-    message += `Phone: ${customerPhone}\n`;
-    if (customerEmail) message += `Email: ${customerEmail}\n`;
-    message += `\nDelivery Address:\n`;
-    message += `${deliveryAddress}\n`;
-    message += `Door/Apt: ${doorNumber}\n`;
-    if (landmark) message += `Landmark: ${landmark}\n`;
-    if (deliveryInstructions) message += `Instructions: ${deliveryInstructions}\n`;
-    
-    if (currentLocation) {
-        message += `\nLocation:\n`;
-        message += `Latitude: ${currentLocation.latitude}\n`;
-        message += `Longitude: ${currentLocation.longitude}\n`;
-        message += `Google Maps: https://www.google.com/maps?q=${currentLocation.latitude},${currentLocation.longitude}\n`;
+// Show tutorial
+function showTutorial() {
+    const tutorialSteps = [
+        {
+            title: 'Welcome to Delvery!',
+            content: 'Let us show you how to order delicious food from our menu.'
+        },
+        {
+            title: 'Browse the Menu',
+            content: 'Scroll through our menu to see all available items. Each item shows its description and price.'
+        },
+        {
+            title: 'Add to Cart',
+            content: 'Click the "Add to Cart" button on any item you want to order. You can add multiple items.'
+        },
+        {
+            title: 'View Your Cart',
+            content: 'Click the cart icon in the top right to view your order. You can adjust quantities or remove items.'
+        },
+        {
+            title: 'Place Your Order',
+            content: 'Fill in your delivery details and click "Place Order" to complete your purchase.'
+        }
+    ];
+
+    let currentStep = 0;
+    const tutorialStepsContainer = document.getElementById('tutorialSteps');
+    const prevStepBtn = document.getElementById('prevStep');
+    const nextStepBtn = document.getElementById('nextStep');
+    const finishBtn = document.getElementById('finishTutorial');
+
+    function showStep(step) {
+        tutorialStepsContainer.innerHTML = `
+            <h4>${tutorialSteps[step].title}</h4>
+            <p>${tutorialSteps[step].content}</p>
+        `;
+
+        prevStepBtn.style.display = step === 0 ? 'none' : 'inline-block';
+        nextStepBtn.style.display = step === tutorialSteps.length - 1 ? 'none' : 'inline-block';
+        finishBtn.style.display = step === tutorialSteps.length - 1 ? 'inline-block' : 'none';
     }
-    
-    message += `\nItems Ordered:\n${orderDetails}\n\n`;
-    message += `Total: ₹${total}`;
-    
-    const whatsappUrl = `https://wa.me/7569226048?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+
+    prevStepBtn.onclick = () => {
+        if (currentStep > 0) {
+            currentStep--;
+            showStep(currentStep);
+        }
+    };
+
+    nextStepBtn.onclick = () => {
+        if (currentStep < tutorialSteps.length - 1) {
+            currentStep++;
+            showStep(currentStep);
+        }
+    };
+
+    finishBtn.onclick = () => {
+        tutorialModal.hide();
+    };
+
+    showStep(currentStep);
+    tutorialModal.show();
 }
 
-// Toast Notification
-function showToast(message) {
+// Toast notification
+function showToast(message, type = 'success') {
     const toast = document.createElement('div');
-    toast.className = 'toast position-fixed bottom-0 end-0 m-3';
+    toast.className = `toast position-fixed bottom-0 end-0 m-3 bg-${type} text-white`;
     toast.setAttribute('role', 'alert');
     toast.setAttribute('aria-live', 'assertive');
     toast.setAttribute('aria-atomic', 'true');
     
     toast.innerHTML = `
-        <div class="toast-header">
+        <div class="toast-header bg-${type} text-white">
             <strong class="me-auto">Notification</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
         </div>
         <div class="toast-body">
             ${message}
@@ -328,187 +323,5 @@ function showToast(message) {
     });
 }
 
-// Event Listeners
-cartBtn.addEventListener('click', () => {
-    updateCartDisplay();
-    toggleCart();
-});
-
-closeCartBtn.addEventListener('click', closeCart);
-
-// Close cart when clicking outside (mobile only)
-document.addEventListener('click', (e) => {
-    if (window.innerWidth <= 768 && 
-        cartPanel.classList.contains('active') && 
-        !cartPanel.contains(e.target) && 
-        !cartBtn.contains(e.target)) {
-        closeCart();
-    }
-});
-
-// Update cart display on window resize
-window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) {
-        cartPanel.classList.remove('active');
-        document.body.classList.remove('cart-open');
-    }
-});
-
-orderForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (cart.length === 0) {
-        showToast('Your cart is empty!');
-        return;
-    }
-    sendWhatsAppOrder();
-    cart = [];
-    updateCartCount();
-    closeCart();
-    orderForm.reset();
-});
-
-// Tutorial Functions
-function initializeTutorial() {
-    const hasSeenTutorial = localStorage.getItem('hasSeenTutorial');
-    if (!hasSeenTutorial) {
-        showTutorial();
-    }
-}
-
-function showTutorial() {
-    currentStep = 0;
-    const tutorialModal = new bootstrap.Modal(document.getElementById('tutorialModal'));
-    tutorialModal.show();
-    updateTutorialStep();
-}
-
-function updateTutorialStep() {
-    const step = tutorialSteps[currentStep];
-    const tutorialStepsContainer = document.getElementById('tutorialSteps');
-    const prevButton = document.getElementById('prevStep');
-    const nextButton = document.getElementById('nextStep');
-    const finishButton = document.getElementById('finishTutorial');
-
-    // Update content
-    tutorialStepsContainer.innerHTML = `
-        <div class="text-center">
-            <div class="tutorial-icon mb-3">
-                <i class="${step.icon} fa-3x"></i>
-            </div>
-            <h4>${step.title}</h4>
-            <p class="lead">${step.content}</p>
-            <div class="tutorial-progress mb-3">
-                Step ${currentStep + 1} of ${tutorialSteps.length}
-            </div>
-            ${step.target ? `<div class="tutorial-highlight" data-target="${step.target}"></div>` : ''}
-        </div>
-    `;
-
-    // Update buttons
-    prevButton.style.display = currentStep > 0 ? 'block' : 'none';
-    nextButton.style.display = currentStep < tutorialSteps.length - 1 ? 'block' : 'none';
-    finishButton.style.display = currentStep === tutorialSteps.length - 1 ? 'block' : 'none';
-
-    // Highlight target element if exists
-    if (step.target) {
-        const targetElement = document.querySelector(step.target);
-        if (targetElement) {
-            targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // Add a pulsing effect to the target element
-            targetElement.classList.add('tutorial-pulse');
-        }
-    }
-}
-
-function nextStep() {
-    if (currentStep < tutorialSteps.length - 1) {
-        currentStep++;
-        updateTutorialStep();
-    }
-}
-
-function prevStep() {
-    if (currentStep > 0) {
-        currentStep--;
-        updateTutorialStep();
-    }
-}
-
-function finishTutorial() {
-    localStorage.setItem('hasSeenTutorial', 'true');
-    const tutorialModal = bootstrap.Modal.getInstance(document.getElementById('tutorialModal'));
-    tutorialModal.hide();
-    showToast('Tutorial completed! You can view it again anytime by clicking "How to Use" in the menu.');
-}
-
-// Add tutorial event listeners
-document.addEventListener('DOMContentLoaded', () => {
-    initializeMenu();
-    updateCartCount();
-    initializeTutorial();
-
-    // Show admin link if user is admin
-    if (localStorage.getItem('isAdmin') === 'true') {
-        document.getElementById('adminNavItem').style.display = 'block';
-    }
-
-    // Tutorial button event listeners
-    document.getElementById('nextStep').addEventListener('click', nextStep);
-    document.getElementById('prevStep').addEventListener('click', prevStep);
-    document.getElementById('finishTutorial').addEventListener('click', finishTutorial);
-    document.getElementById('showTutorialBtn').addEventListener('click', (e) => {
-        e.preventDefault();
-        showTutorial();
-    });
-
-    // Location checkbox event listener
-    document.getElementById('useCurrentLocation').addEventListener('change', (e) => {
-        if (e.target.checked) {
-            getCurrentLocation();
-        } else {
-            currentLocation = null;
-            document.getElementById('locationStatus').innerHTML = '';
-        }
-    });
-});
-
-// Buy Now Function
-function buyNow(id) {
-    const quantity = parseInt(document.getElementById(`quantity-${id}`).textContent) || 0;
-    if (quantity === 0) {
-        showToast('Please select quantity first!');
-        return;
-    }
-
-    const item = menuItems.find(item => item.id === id);
-    if (item) {
-        // Add item to cart with selected quantity
-        const existingItem = cart.find(cartItem => cartItem.id === id);
-        if (existingItem) {
-            existingItem.quantity = quantity; // Use selected quantity
-        } else {
-            cart.push({
-                ...item,
-                quantity: quantity
-            });
-        }
-        
-        // Update cart count and display
-        updateCartCount();
-        updateCartDisplay();
-        
-        // Show cart panel
-        toggleCart();
-        
-        // Show success message
-        showToast('Item added to cart!');
-        
-        // Reset quantity
-        document.getElementById(`quantity-${id}`).textContent = '0';
-        const buyNowBtn = document.getElementById(`buyNowBtn-${id}`);
-        if (buyNowBtn) {
-            buyNowBtn.disabled = true;
-            buyNowBtn.style.opacity = '0.6';
-        }
-    }
-} 
+// Initialize the page when it loads
+document.addEventListener('DOMContentLoaded', initializePage); 
