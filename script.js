@@ -31,7 +31,7 @@ const menuItems = JSON.parse(localStorage.getItem('menuItems')) || [
 ];
 
 // Cart State
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let cart = [];
 
 // DOM Elements
 const menuContainer = document.getElementById('menuItems');
@@ -41,6 +41,47 @@ const closeCartBtn = document.getElementById('closeCart');
 const cartItemsContainer = document.getElementById('cartItems');
 const cartTotalElement = document.getElementById('cartTotal');
 const orderForm = document.getElementById('orderForm');
+
+// Tutorial State
+let currentStep = 0;
+const tutorialSteps = [
+    {
+        title: "Welcome to Delvery!",
+        content: "Let's take a quick tour of how to use our website to order delicious food.",
+        target: null,
+        icon: "fas fa-utensils"
+    },
+    {
+        title: "Browse Our Menu",
+        content: "Scroll down to see our delicious menu items. Each item shows its description and price.",
+        target: "#menu",
+        icon: "fas fa-list"
+    },
+    {
+        title: "Select Your Items",
+        content: "Use the + and - buttons to select the quantity of each item you want to order.",
+        target: ".quantity-selector",
+        icon: "fas fa-plus-minus"
+    },
+    {
+        title: "Add to Cart",
+        content: "Click the 'Add to Cart' button to add your selected items to your cart.",
+        target: ".menu-item .btn-primary",
+        icon: "fas fa-cart-plus"
+    },
+    {
+        title: "View Your Cart",
+        content: "Click the cart icon in the top right to view your selected items and total.",
+        target: "#cartBtn",
+        icon: "fas fa-shopping-cart"
+    },
+    {
+        title: "Place Your Order",
+        content: "Fill in your details and click 'Place Order' to send your order via WhatsApp.",
+        target: "#orderForm",
+        icon: "fas fa-paper-plane"
+    }
+];
 
 // Location State
 let currentLocation = null;
@@ -69,9 +110,28 @@ function getCurrentLocation() {
     }
 }
 
-// Initialize Menu
-function initializeMenu() {
-    menuContainer.innerHTML = menuItems.map(item => `
+// Search Functionality
+function filterProducts(searchTerm) {
+    const filteredItems = menuItems.filter(item => 
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    
+    displayFilteredProducts(filteredItems);
+}
+
+function displayFilteredProducts(items) {
+    if (items.length === 0) {
+        menuContainer.innerHTML = `
+            <div class="col-12 no-results">
+                <i class="fas fa-search"></i>
+                <p>No products found matching your search.</p>
+            </div>
+        `;
+        return;
+    }
+
+    menuContainer.innerHTML = items.map(item => `
         <div class="col-md-4 mb-4">
             <div class="menu-item">
                 <img src="${item.image}" alt="${item.name}">
@@ -84,13 +144,28 @@ function initializeMenu() {
                         <span class="mx-2" id="quantity-${item.id}">0</span>
                         <button class="btn btn-sm btn-outline-primary" onclick="updateQuantity(${item.id}, 1)">+</button>
                     </div>
-                    <button class="btn btn-primary" onclick="addToCart(${item.id})" id="addToCartBtn-${item.id}">
-                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    <button class="btn btn-primary" onclick="buyNow(${item.id})" id="buyNowBtn-${item.id}">
+                        <i class="fas fa-shopping-cart"></i> Buy Now
                     </button>
                 </div>
             </div>
         </div>
     `).join('');
+}
+
+// Event Listeners for Search
+document.getElementById('searchInput').addEventListener('input', (e) => {
+    filterProducts(e.target.value);
+});
+
+document.getElementById('searchButton').addEventListener('click', () => {
+    const searchTerm = document.getElementById('searchInput').value;
+    filterProducts(searchTerm);
+});
+
+// Initialize Menu
+function initializeMenu() {
+    displayFilteredProducts(menuItems);
 }
 
 // Update quantity function
@@ -100,17 +175,29 @@ function updateQuantity(itemId, change) {
     const newQuantity = Math.max(0, currentQuantity + change);
     quantitySpan.textContent = newQuantity;
     
-    // Update Add to Cart button state
-    const addToCartBtn = document.getElementById(`addToCartBtn-${itemId}`);
-    if (addToCartBtn) {
-        addToCartBtn.disabled = newQuantity === 0;
-        addToCartBtn.style.opacity = newQuantity === 0 ? '0.6' : '1';
+    // Update Buy Now button state
+    const buyNowBtn = document.getElementById(`buyNowBtn-${itemId}`);
+    if (buyNowBtn) {
+        buyNowBtn.disabled = newQuantity === 0;
+        buyNowBtn.style.opacity = newQuantity === 0 ? '0.6' : '1';
     }
 }
 
 // Cart Functions
+function incrementQuantity(itemId) {
+    const input = document.getElementById(`quantity-${itemId}`);
+    input.value = parseInt(input.value) + 1;
+}
+
+function decrementQuantity(itemId) {
+    const input = document.getElementById(`quantity-${itemId}`);
+    if (parseInt(input.value) > 0) {
+        input.value = parseInt(input.value) - 1;
+    }
+}
+
 function addToCart(itemId) {
-    const quantity = parseInt(document.getElementById(`quantity-${itemId}`).textContent);
+    const quantity = parseInt(document.getElementById(`quantity-${itemId}`).value);
     if (quantity > 0) {
         const item = menuItems.find(item => item.id === itemId);
         const cartItem = cart.find(item => item.id === itemId);
@@ -124,20 +211,8 @@ function addToCart(itemId) {
             });
         }
         
-        // Save cart to localStorage
-        localStorage.setItem('cart', JSON.stringify(cart));
-        
         updateCartCount();
-        updateCartDisplay();
         showToast('Item added to cart!');
-        
-        // Reset quantity
-        document.getElementById(`quantity-${itemId}`).textContent = '0';
-        const addToCartBtn = document.getElementById(`addToCartBtn-${itemId}`);
-        if (addToCartBtn) {
-            addToCartBtn.disabled = true;
-            addToCartBtn.style.opacity = '0.6';
-        }
     }
 }
 
@@ -153,14 +228,9 @@ function updateCartDisplay() {
                 <h6>${item.name}</h6>
                 <small>₹${item.price} x ${item.quantity}</small>
             </div>
-            <div class="d-flex align-items-center">
-                <button class="btn btn-sm btn-outline-primary me-2" onclick="updateCartQuantity(${item.id}, -1)">-</button>
-                <span>${item.quantity}</span>
-                <button class="btn btn-sm btn-outline-primary ms-2" onclick="updateCartQuantity(${item.id}, 1)">+</button>
-                <button class="btn btn-sm btn-danger ms-2" onclick="removeFromCart(${item.id})">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
+            <button class="btn btn-sm btn-danger" onclick="removeFromCart(${item.id})">
+                <i class="fas fa-trash"></i>
+            </button>
         </div>
     `).join('');
     
@@ -168,23 +238,8 @@ function updateCartDisplay() {
     cartTotalElement.textContent = total;
 }
 
-function updateCartQuantity(itemId, change) {
-    const cartItem = cart.find(item => item.id === itemId);
-    if (cartItem) {
-        cartItem.quantity = Math.max(0, cartItem.quantity + change);
-        if (cartItem.quantity === 0) {
-            removeFromCart(itemId);
-        } else {
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartCount();
-            updateCartDisplay();
-        }
-    }
-}
-
 function removeFromCart(itemId) {
     cart = cart.filter(item => item.id !== itemId);
-    localStorage.setItem('cart', JSON.stringify(cart));
     updateCartCount();
     updateCartDisplay();
 }
@@ -231,70 +286,229 @@ function sendWhatsAppOrder() {
     message += `Door/Apt: ${doorNumber}\n`;
     if (landmark) message += `Landmark: ${landmark}\n`;
     if (deliveryInstructions) message += `Instructions: ${deliveryInstructions}\n`;
-    if (currentLocation) {
-        message += `\nLocation: https://www.google.com/maps?q=${currentLocation.latitude},${currentLocation.longitude}\n`;
-    }
-    message += `\nOrder Details:\n${orderDetails}\n\n`;
-    message += `Total Amount: ₹${total}`;
     
-    const whatsappUrl = `https://wa.me/917569226048?text=${encodeURIComponent(message)}`;
+    if (currentLocation) {
+        message += `\nLocation:\n`;
+        message += `Latitude: ${currentLocation.latitude}\n`;
+        message += `Longitude: ${currentLocation.longitude}\n`;
+        message += `Google Maps: https://www.google.com/maps?q=${currentLocation.latitude},${currentLocation.longitude}\n`;
+    }
+    
+    message += `\nItems Ordered:\n${orderDetails}\n\n`;
+    message += `Total: ₹${total}`;
+    
+    const whatsappUrl = `https://wa.me/7569226048?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
 }
 
+// Toast Notification
 function showToast(message) {
     const toast = document.createElement('div');
-    toast.className = 'toast';
+    toast.className = 'toast position-fixed bottom-0 end-0 m-3';
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    
     toast.innerHTML = `
+        <div class="toast-header">
+            <strong class="me-auto">Notification</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
         <div class="toast-body">
             ${message}
         </div>
     `;
+    
     document.body.appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
     
-    setTimeout(() => {
-        toast.classList.add('show');
-    }, 100);
-    
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => {
-            document.body.removeChild(toast);
-        }, 300);
-    }, 3000);
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
 }
 
 // Event Listeners
+cartBtn.addEventListener('click', () => {
+    updateCartDisplay();
+    toggleCart();
+});
+
+closeCartBtn.addEventListener('click', closeCart);
+
+// Close cart when clicking outside (mobile only)
+document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 768 && 
+        cartPanel.classList.contains('active') && 
+        !cartPanel.contains(e.target) && 
+        !cartBtn.contains(e.target)) {
+        closeCart();
+    }
+});
+
+// Update cart display on window resize
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+        cartPanel.classList.remove('active');
+        document.body.classList.remove('cart-open');
+    }
+});
+
+orderForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (cart.length === 0) {
+        showToast('Your cart is empty!');
+        return;
+    }
+    sendWhatsAppOrder();
+    cart = [];
+    updateCartCount();
+    closeCart();
+    orderForm.reset();
+});
+
+// Tutorial Functions
+function initializeTutorial() {
+    const hasSeenTutorial = localStorage.getItem('hasSeenTutorial');
+    if (!hasSeenTutorial) {
+        showTutorial();
+    }
+}
+
+function showTutorial() {
+    currentStep = 0;
+    const tutorialModal = new bootstrap.Modal(document.getElementById('tutorialModal'));
+    tutorialModal.show();
+    updateTutorialStep();
+}
+
+function updateTutorialStep() {
+    const step = tutorialSteps[currentStep];
+    const tutorialStepsContainer = document.getElementById('tutorialSteps');
+    const prevButton = document.getElementById('prevStep');
+    const nextButton = document.getElementById('nextStep');
+    const finishButton = document.getElementById('finishTutorial');
+
+    // Update content
+    tutorialStepsContainer.innerHTML = `
+        <div class="text-center">
+            <div class="tutorial-icon mb-3">
+                <i class="${step.icon} fa-3x"></i>
+            </div>
+            <h4>${step.title}</h4>
+            <p class="lead">${step.content}</p>
+            <div class="tutorial-progress mb-3">
+                Step ${currentStep + 1} of ${tutorialSteps.length}
+            </div>
+            ${step.target ? `<div class="tutorial-highlight" data-target="${step.target}"></div>` : ''}
+        </div>
+    `;
+
+    // Update buttons
+    prevButton.style.display = currentStep > 0 ? 'block' : 'none';
+    nextButton.style.display = currentStep < tutorialSteps.length - 1 ? 'block' : 'none';
+    finishButton.style.display = currentStep === tutorialSteps.length - 1 ? 'block' : 'none';
+
+    // Highlight target element if exists
+    if (step.target) {
+        const targetElement = document.querySelector(step.target);
+        if (targetElement) {
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Add a pulsing effect to the target element
+            targetElement.classList.add('tutorial-pulse');
+        }
+    }
+}
+
+function nextStep() {
+    if (currentStep < tutorialSteps.length - 1) {
+        currentStep++;
+        updateTutorialStep();
+    }
+}
+
+function prevStep() {
+    if (currentStep > 0) {
+        currentStep--;
+        updateTutorialStep();
+    }
+}
+
+function finishTutorial() {
+    localStorage.setItem('hasSeenTutorial', 'true');
+    const tutorialModal = bootstrap.Modal.getInstance(document.getElementById('tutorialModal'));
+    tutorialModal.hide();
+    showToast('Tutorial completed! You can view it again anytime by clicking "How to Use" in the menu.');
+}
+
+// Add tutorial event listeners
 document.addEventListener('DOMContentLoaded', () => {
     initializeMenu();
     updateCartCount();
-    updateCartDisplay();
-    
-    cartBtn.addEventListener('click', toggleCart);
-    closeCartBtn.addEventListener('click', closeCart);
-    
-    orderForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        if (cart.length === 0) {
-            showToast('Your cart is empty!');
-            return;
-        }
-        sendWhatsAppOrder();
-        cart = [];
-        localStorage.removeItem('cart');
-        updateCartCount();
-        closeCart();
-        orderForm.reset();
-    });
-    
-    const useCurrentLocationCheckbox = document.getElementById('useCurrentLocation');
-    if (useCurrentLocationCheckbox) {
-        useCurrentLocationCheckbox.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                getCurrentLocation();
-            } else {
-                currentLocation = null;
-                document.getElementById('locationStatus').innerHTML = '';
-            }
-        });
+    initializeTutorial();
+
+    // Show admin link if user is admin
+    if (localStorage.getItem('isAdmin') === 'true') {
+        document.getElementById('adminNavItem').style.display = 'block';
     }
-}); 
+
+    // Tutorial button event listeners
+    document.getElementById('nextStep').addEventListener('click', nextStep);
+    document.getElementById('prevStep').addEventListener('click', prevStep);
+    document.getElementById('finishTutorial').addEventListener('click', finishTutorial);
+    document.getElementById('showTutorialBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        showTutorial();
+    });
+
+    // Location checkbox event listener
+    document.getElementById('useCurrentLocation').addEventListener('change', (e) => {
+        if (e.target.checked) {
+            getCurrentLocation();
+        } else {
+            currentLocation = null;
+            document.getElementById('locationStatus').innerHTML = '';
+        }
+    });
+});
+
+// Buy Now Function
+function buyNow(id) {
+    const quantity = parseInt(document.getElementById(`quantity-${id}`).textContent) || 0;
+    if (quantity === 0) {
+        showToast('Please select quantity first!');
+        return;
+    }
+
+    const item = menuItems.find(item => item.id === id);
+    if (item) {
+        // Add item to cart with selected quantity
+        const existingItem = cart.find(cartItem => cartItem.id === id);
+        if (existingItem) {
+            existingItem.quantity = quantity; // Use selected quantity
+        } else {
+            cart.push({
+                ...item,
+                quantity: quantity
+            });
+        }
+        
+        // Update cart count and display
+        updateCartCount();
+        updateCartDisplay();
+        
+        // Show cart panel
+        toggleCart();
+        
+        // Show success message
+        showToast('Item added to cart!');
+        
+        // Reset quantity
+        document.getElementById(`quantity-${id}`).textContent = '0';
+        const buyNowBtn = document.getElementById(`buyNowBtn-${id}`);
+        if (buyNowBtn) {
+            buyNowBtn.disabled = true;
+            buyNowBtn.style.opacity = '0.6';
+        }
+    }
+} 
