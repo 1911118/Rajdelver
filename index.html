@@ -65,7 +65,7 @@
     </section>
 
     <!-- Menu Section -->
-    <section id="menu" class="py-5">
+    <section id="menu" class="py-5 tutorial-pulse">
         <div class="container">
             <h2 class="text-center mb-5">Our Menu</h2>
             
@@ -81,131 +81,41 @@
                 </div>
             </div>
 
-            <div class="row" id="menuItems">
-                <!-- Menu items will be dynamically added here -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Cart Side Panel -->
-    <div id="cartPanel" class="cart-panel">
-        <div class="cart-header">
-            <h5>Your Cart</h5>
-            <button type="button" class="btn-close" id="closeCart"></button>
-        </div>
-        <div class="cart-body">
-            <div id="cartItems">
-                <!-- Cart items will be dynamically added here -->
-            </div>
-            <div class="cart-total">
-                <h5>Total: ₹<span id="cartTotal">0</span></h5>
-            </div>
-            <form id="orderForm">
-                <div class="mb-3">
-                    <label for="customerName" class="form-label">Full Name</label>
-                    <input type="text" class="form-control" id="customerName" required>
-                </div>
-                <div class="mb-3">
-                    <label for="customerPhone" class="form-label">Phone Number</label>
-                    <input type="tel" class="form-control" id="customerPhone" required>
-                </div>
-                <div class="mb-3">
-                    <label for="customerEmail" class="form-label">Email (Optional)</label>
-                    <input type="email" class="form-control" id="customerEmail">
-                </div>
-                <div class="mb-3">
-                    <label for="deliveryAddress" class="form-label">Street Address</label>
-                    <textarea class="form-control" id="deliveryAddress" required></textarea>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="doorNumber" class="form-label">Door/Apartment Number</label>
-                        <input type="text" class="form-control" id="doorNumber" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="landmark" class="form-label">Landmark (Optional)</label>
-                        <input type="text" class="form-control" id="landmark">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3" id="menuItems">
+                <div class="col">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1604382355076-af4b0eb60143?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Margherita Pizza">
+                        <h3>Margherita Pizza</h3>
+                        <p>Classic tomato sauce with mozzarella cheese and fresh basil</p>
+                        <div class="price">₹299</div>
                     </div>
                 </div>
-                <div class="mb-3">
-                    <label for="deliveryInstructions" class="form-label">Delivery Instructions (Optional)</label>
-                    <textarea class="form-control" id="deliveryInstructions" rows="2"></textarea>
-                </div>
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="useCurrentLocation">
-                        <label class="form-check-label" for="useCurrentLocation">
-                            Use my current location
-                        </label>
+                <div class="col">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Chicken Burger">
+                        <h3>Chicken Burger</h3>
+                        <p>Grilled chicken patty with lettuce, tomato, and special sauce</p>
+                        <div class="price">₹199</div>
                     </div>
-                    <div id="locationStatus" class="mt-2"></div>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Place Order</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- About Section -->
-    <section id="about" class="about-section py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center mb-4">About Us</h2>
-            <div class="row">
-                <div class="col-md-6">
-                    <p>We are passionate about delivering the best food experience to our customers. Our commitment to quality and service makes us your preferred delivery partner.</p>
+                <div class="col">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1645112411341-6c1f3c1c5c4f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Pasta Alfredo">
+                        <h3>Pasta Alfredo</h3>
+                        <p>Creamy Alfredo sauce with fettuccine pasta and parmesan cheese</p>
+                        <div class="price">₹249</div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="contact-section py-5">
-        <div class="container">
-            <h2 class="text-center mb-4">Contact Us</h2>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="contact-info">
-                        <h4>Get in Touch</h4>
-                        <p><i class="fas fa-phone"></i> +91 7569226048</p>
-                        <p><i class="fas fa-clock"></i> Business Hours: 9:00 AM - 10:00 PM</p>
+                <div class="col">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1527477396000-e27163b481c2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Chicken Wings">
+                        <h3>Chicken Wings</h3>
+                        <p>Crispy chicken wings with your choice of sauce</p>
+                        <div class="price">₹399</div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-4">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <p>&copy; 2024 Delvery. All rights reserved.</p>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Tutorial Modal -->
-    <div class="modal fade" id="tutorialModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Welcome to Delvery! Let's get started</h5>
-                </div>
-                <div class="modal-body">
-                    <div id="tutorialSteps">
-                        <!-- Steps will be dynamically added here -->
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="prevStep" style="display: none;">Previous</button>
-                    <button type="button" class="btn btn-primary" id="nextStep">Next</button>
-                    <button type="button" class="btn btn-success" id="finishTutorial" style="display: none;">Finish</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="script.js"></script>
 </body>
-</html> 
+</html>
