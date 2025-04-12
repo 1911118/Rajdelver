@@ -3,110 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Management - Delvery</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <title>Product Management</title>
     <style>
-        .product-form {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background: #fff;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .product-list {
-            margin-top: 2rem;
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
         }
-        .product-item {
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .add-product-form {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
             border: 1px solid #ddd;
-            padding: 1rem;
-            margin-bottom: 1rem;
             border-radius: 4px;
         }
-        .product-image-preview {
-            max-width: 100px;
-            max-height: 100px;
-            object-fit: cover;
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="index.html">Delvery</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.html">Back to Website</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
     <div class="container">
-        <div class="product-form">
-            <h2 class="mb-4">Product Management</h2>
-            <form id="productForm">
-                <input type="hidden" id="productId">
-                <div class="mb-3">
-                    <label for="productName" class="form-label">Product Name</label>
-                    <input type="text" class="form-control" id="productName" required>
-                </div>
-                <div class="mb-3">
-                    <label for="productDescription" class="form-label">Description</label>
-                    <textarea class="form-control" id="productDescription" rows="3" required></textarea>
-                </div>
-                <div class="mb-3">
-                    <label for="productPrice" class="form-label">Price (₹)</label>
-                    <input type="number" class="form-control" id="productPrice" min="0" step="0.01" required>
-                </div>
-                <div class="mb-3">
-                    <label for="productCategory" class="form-label">Category</label>
-                    <select class="form-control" id="productCategory" required>
-                        <option value="vegetables">Vegetables & Greens</option>
-                        <option value="dairy">Dairy Products</option>
-                        <option value="meat">Meat & Poultry</option>
-                        <option value="pulses">Pulses</option>
-                        <option value="grains">Grains & Flours</option>
-                        <option value="spices">Spices & Condiments</option>
-                        <option value="snacks">Snacks & Bakery</option>
-                        <option value="oils">Oils</option>
-                        <option value="cleaning">Cleaning & Household</option>
-                        <option value="puja">Puja & Religious Items</option>
-                        <option value="newspapers">Newspapers</option>
-                        <option value="furniture">Furniture & Mattress</option>
-                        <option value="dryfruits">Dry Fruits</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="productImage" class="form-label">Image URL</label>
-                    <input type="url" class="form-control" id="productImage" required>
-                    <div class="mt-2">
-                        <img id="imagePreview" class="product-image-preview d-none" alt="Product preview">
-                    </div>
-                </div>
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-primary">Save Product</button>
-                    <button type="button" class="btn btn-secondary" onclick="resetForm()">Clear Form</button>
-                </div>
-            </form>
-        </div>
+        <h1>Product Management</h1>
+        
+        <table id="productsTable">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Nature</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="productsTableBody">
+                <!-- Products will be loaded here dynamically -->
+            </tbody>
+        </table>
 
-        <div class="product-list">
-            <h3 class="mb-4">Current Products</h3>
-            <div id="productsList">
-                <!-- Products will be loaded here -->
-            </div>
+        <div class="add-product-form">
+            <h2>Add New Product</h2>
+            <form id="addProductForm">
+                <div class="form-group">
+                    <label for="item">Item Name:</label>
+                    <input type="text" id="item" required>
+                </div>
+                <div class="form-group">
+                    <label for="nature">Nature:</label>
+                    <input type="text" id="nature" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <input type="text" id="description" required>
+                </div>
+                <div class="form-group">
+                    <label for="price">Price:</label>
+                    <input type="text" id="price" required>
+                </div>
+                <button type="submit">Add Product</button>
+            </form>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="product-management.js"></script>
+    <script src="products.js"></script>
+    <script>
+        // Function to load products into table
+        function loadProducts() {
+            const tableBody = document.getElementById('productsTableBody');
+            tableBody.innerHTML = '';
+
+            products.forEach((product, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.item}</td>
+                    <td>${product.nature}</td>
+                    <td>${product.description}</td>
+                    <td>${product.price}</td>
+                    <td>
+                        <button onclick="editProduct(${index})">Edit</button>
+                        <button onclick="deleteProduct(${index})">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Function to add new product
+        document.getElementById('addProductForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newProduct = {
+                item: document.getElementById('item').value,
+                nature: document.getElementById('nature').value,
+                description: document.getElementById('description').value,
+                price: document.getElementById('price').value
+            };
+
+            products.push(newProduct);
+            loadProducts();
+            this.reset();
+        });
+
+        // Function to edit product
+        function editProduct(index) {
+            const product = products[index];
+            document.getElementById('item').value = product.item;
+            document.getElementById('nature').value = product.nature;
+            document.getElementById('description').value = product.description;
+            document.getElementById('price').value = product.price;
+            
+            // Remove the old product
+            products.splice(index, 1);
+            loadProducts();
+        }
+
+        // Function to delete product
+        function deleteProduct(index) {
+            if (confirm('Are you sure you want to delete this product?')) {
+                products.splice(index, 1);
+                loadProducts();
+            }
+        }
+
+        // Load products when page loads
+        window.onload = loadProducts;
+    </script>
 </body>
 </html> 
