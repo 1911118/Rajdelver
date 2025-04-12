@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Menu - Rajdelver</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .menu-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .menu-item:hover {
+            transform: translateY(-5px);
+        }
+        .menu-item h3 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+        }
+        .menu-item .nature {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        .menu-item .description {
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+        .menu-item .price {
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .category-filter {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .filter-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin: 0 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .filter-btn:hover {
+            background-color: #45a049;
+        }
+        .filter-btn.active {
+            background-color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Browse Our Menu</h1>
+        
+        <div class="category-filter">
+            <button class="filter-btn active" onclick="filterProducts('all')">All Items</button>
+            <button class="filter-btn" onclick="filterProducts('Weight')">By Weight</button>
+            <button class="filter-btn" onclick="filterProducts('volume')">By Volume</button>
+            <button class="filter-btn" onclick="filterProducts('Pack')">Packaged Items</button>
+            <button class="filter-btn" onclick="filterProducts('Piece')">By Piece</button>
+        </div>
+
+        <div class="menu-grid" id="menuGrid">
+            <!-- Products will be loaded here dynamically -->
+        </div>
+    </div>
+
+    <script src="products.js"></script>
+    <script>
+        function displayProducts(filterCategory = 'all') {
+            const menuGrid = document.getElementById('menuGrid');
+            menuGrid.innerHTML = '';
+
+            const filteredProducts = filterCategory === 'all' 
+                ? window.products 
+                : window.products.filter(product => product.nature.toLowerCase() === filterCategory.toLowerCase());
+
+            filteredProducts.forEach(product => {
+                const menuItem = document.createElement('div');
+                menuItem.className = 'menu-item';
+                menuItem.innerHTML = `
+                    <h3>${product.item}</h3>
+                    <div class="nature">${product.nature}</div>
+                    <div class="description">${product.description}</div>
+                    <div class="price">${product.price}</div>
+                `;
+                menuGrid.appendChild(menuItem);
+            });
+        }
+
+        function filterProducts(category) {
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            displayProducts(category);
+        }
+
+        // Load products when page loads
+        window.addEventListener('load', () => displayProducts());
+    </script>
+</body>
+</html> 

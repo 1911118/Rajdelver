@@ -38,6 +38,7 @@ function updateUserProfile() {
     const signOutLink = document.getElementById('signOutLink');
     const profileLink = document.getElementById('profileLink');
     const dropdownDivider = document.getElementById('dropdownDivider');
+    const adminMenuItems = document.querySelectorAll('.admin-only');
     
     if (currentUser) {
         userNameElement.textContent = currentUser.fullName;
@@ -46,6 +47,12 @@ function updateUserProfile() {
         dropdownDivider.style.display = 'block';
         profileLink.style.display = 'block';
         signOutLink.style.display = 'block';
+        
+        // Show admin menu items if user is admin
+        const isAdmin = sessionStorage.getItem('isAdminLoggedIn') === 'true';
+        adminMenuItems.forEach(item => {
+            item.style.display = isAdmin ? 'block' : 'none';
+        });
     } else {
         userNameElement.textContent = 'Sign In';
         signInLink.style.display = 'block';
@@ -53,6 +60,11 @@ function updateUserProfile() {
         dropdownDivider.style.display = 'none';
         profileLink.style.display = 'none';
         signOutLink.style.display = 'none';
+        
+        // Hide admin menu items for non-logged in users
+        adminMenuItems.forEach(item => {
+            item.style.display = 'none';
+        });
     }
 }
 

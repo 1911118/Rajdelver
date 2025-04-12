@@ -89,11 +89,51 @@
         .notification.success {
             background-color: #4CAF50;
         }
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .admin-content {
+            display: none;
+        }
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .error-message {
+            color: #f44336;
+            margin-top: 10px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Product Management</h1>
+    <div id="loginContainer" class="login-container">
+        <h1>Admin Login</h1>
+        <form id="loginForm" class="login-form">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit">Login</button>
+            <div id="loginError" class="error-message"></div>
+        </form>
+    </div>
+
+    <div id="adminContent" class="admin-content container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>Product Management</h1>
+            <button onclick="logout()" style="height: 40px;">Logout</button>
+        </div>
         
         <div id="notification" class="notification"></div>
         
@@ -138,6 +178,40 @@
 
     <script src="products.js"></script>
     <script>
+        // Admin credentials (in a real application, these should be stored securely on a server)
+        const ADMIN_USERNAME = 'admin';
+        const ADMIN_PASSWORD = 'admin123';
+
+        // Check if user is already logged in
+        function checkAuth() {
+            const isLoggedIn = sessionStorage.getItem('isAdminLoggedIn') === 'true';
+            document.getElementById('loginContainer').style.display = isLoggedIn ? 'none' : 'block';
+            document.getElementById('adminContent').style.display = isLoggedIn ? 'block' : 'none';
+            if (isLoggedIn) {
+                loadProducts();
+            }
+        }
+
+        // Handle login
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                sessionStorage.setItem('isAdminLoggedIn', 'true');
+                checkAuth();
+            } else {
+                document.getElementById('loginError').textContent = 'Invalid username or password';
+            }
+        });
+
+        // Handle logout
+        function logout() {
+            sessionStorage.removeItem('isAdminLoggedIn');
+            checkAuth();
+        }
+
         // Function to show notification
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
@@ -232,14 +306,8 @@
             }
         }
 
-        // Load products when page loads
-        window.addEventListener('load', function() {
-            try {
-                loadProducts();
-            } catch (error) {
-                showNotification('Error loading products: ' + error.message, 'error');
-            }
-        });
+        // Check authentication when page loads
+        window.addEventListener('load', checkAuth);
     </script>
 </body>
 </html> 
