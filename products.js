@@ -1,4 +1,5 @@
-const products = [
+// Initial products data
+const initialProducts = [
     {
         item: "Tamoto",
         nature: "Weight",
@@ -72,6 +73,18 @@ const products = [
         price: "₹700/kg"
     }
 ];
+
+// Get products from localStorage or use initial data
+let products = JSON.parse(localStorage.getItem('products')) || initialProducts;
+
+// Function to save products to localStorage
+function saveProducts() {
+    localStorage.setItem('products', JSON.stringify(products));
+}
+
+// Make products available globally
+window.products = products;
+window.saveProducts = saveProducts;
 
 // Export the products array
 if (typeof module !== 'undefined' && module.exports) {

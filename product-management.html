@@ -74,11 +74,28 @@
         button:hover {
             background-color: #45a049;
         }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            color: white;
+            display: none;
+        }
+        .notification.error {
+            background-color: #f44336;
+        }
+        .notification.success {
+            background-color: #4CAF50;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Product Management</h1>
+        
+        <div id="notification" class="notification"></div>
         
         <table id="productsTable">
             <thead>
@@ -121,66 +138,108 @@
 
     <script src="products.js"></script>
     <script>
+        // Function to show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
         // Function to load products into table
         function loadProducts() {
-            const tableBody = document.getElementById('productsTableBody');
-            tableBody.innerHTML = '';
+            try {
+                const tableBody = document.getElementById('productsTableBody');
+                tableBody.innerHTML = '';
 
-            products.forEach((product, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${product.item}</td>
-                    <td>${product.nature}</td>
-                    <td>${product.description}</td>
-                    <td>${product.price}</td>
-                    <td>
-                        <button onclick="editProduct(${index})">Edit</button>
-                        <button onclick="deleteProduct(${index})">Delete</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
+                if (!window.products || !Array.isArray(window.products)) {
+                    throw new Error('Products data is not available');
+                }
+
+                window.products.forEach((product, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${product.item}</td>
+                        <td>${product.nature}</td>
+                        <td>${product.description}</td>
+                        <td>${product.price}</td>
+                        <td>
+                            <button onclick="editProduct(${index})">Edit</button>
+                            <button onclick="deleteProduct(${index})">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                showNotification('Error loading products: ' + error.message, 'error');
+            }
         }
 
         // Function to add new product
         document.getElementById('addProductForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            const newProduct = {
-                item: document.getElementById('item').value,
-                nature: document.getElementById('nature').value,
-                description: document.getElementById('description').value,
-                price: document.getElementById('price').value
-            };
+            try {
+                const newProduct = {
+                    item: document.getElementById('item').value,
+                    nature: document.getElementById('nature').value,
+                    description: document.getElementById('description').value,
+                    price: document.getElementById('price').value
+                };
 
-            products.push(newProduct);
-            loadProducts();
-            this.reset();
+                window.products.push(newProduct);
+                window.saveProducts();
+                loadProducts();
+                this.reset();
+                showNotification('Product added successfully');
+            } catch (error) {
+                showNotification('Error adding product: ' + error.message, 'error');
+            }
         });
 
         // Function to edit product
         function editProduct(index) {
-            const product = products[index];
-            document.getElementById('item').value = product.item;
-            document.getElementById('nature').value = product.nature;
-            document.getElementById('description').value = product.description;
-            document.getElementById('price').value = product.price;
-            
-            // Remove the old product
-            products.splice(index, 1);
-            loadProducts();
+            try {
+                const product = window.products[index];
+                document.getElementById('item').value = product.item;
+                document.getElementById('nature').value = product.nature;
+                document.getElementById('description').value = product.description;
+                document.getElementById('price').value = product.price;
+                
+                window.products.splice(index, 1);
+                window.saveProducts();
+                loadProducts();
+                showNotification('Product ready for editing');
+            } catch (error) {
+                showNotification('Error editing product: ' + error.message, 'error');
+            }
         }
 
         // Function to delete product
         function deleteProduct(index) {
-            if (confirm('Are you sure you want to delete this product?')) {
-                products.splice(index, 1);
-                loadProducts();
+            try {
+                if (confirm('Are you sure you want to delete this product?')) {
+                    window.products.splice(index, 1);
+                    window.saveProducts();
+                    loadProducts();
+                    showNotification('Product deleted successfully');
+                }
+            } catch (error) {
+                showNotification('Error deleting product: ' + error.message, 'error');
             }
         }
 
         // Load products when page loads
-        window.onload = loadProducts;
+        window.addEventListener('load', function() {
+            try {
+                loadProducts();
+            } catch (error) {
+                showNotification('Error loading products: ' + error.message, 'error');
+            }
+        });
     </script>
 </body>
 </html> 
