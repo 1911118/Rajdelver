@@ -1,7 +1,141 @@
-// Get menu items from localStorage
-let menuItems = JSON.parse(localStorage.getItem('menuItems')) || [];
+// API endpoints
+const API_URL = 'http://localhost:3000/api';
+
+// Menu items will be fetched from server
+let menuItems = [];
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 let orderId = 1;
+let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+
+// Get menu items from server
+async function fetchMenuItems() {
+    try {
+        const response = await fetch(`${API_URL}/products`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch products');
+        }
+        menuItems = await response.json();
+        displayMenuItems();
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        showToast('Error loading products. Please try again later.', 'danger');
+    }
+}
+
+// Initialize the page
+async function initializePage() {
+    await fetchMenuItems();
+    updateCart();
+    setupEventListeners();
+    updateUserProfile();
+}
+
+// Update user profile in the navigation
+function updateUserProfile() {
+    const userNameElement = document.getElementById('userName');
+    const signInLink = document.getElementById('signInLink');
+    const signUpLink = document.getElementById('signUpLink');
+    const signOutLink = document.getElementById('signOutLink');
+    const profileLink = document.getElementById('profileLink');
+    const dropdownDivider = document.getElementById('dropdownDivider');
+    
+    if (currentUser) {
+        userNameElement.textContent = currentUser.fullName;
+        signInLink.style.display = 'none';
+        signUpLink.style.display = 'none';
+        dropdownDivider.style.display = 'block';
+        profileLink.style.display = 'block';
+        signOutLink.style.display = 'block';
+    } else {
+        userNameElement.textContent = 'Sign In';
+        signInLink.style.display = 'block';
+        signUpLink.style.display = 'block';
+        dropdownDivider.style.display = 'none';
+        profileLink.style.display = 'none';
+        signOutLink.style.display = 'none';
+    }
+}
+
+// Sign out function
+function signOut() {
+    localStorage.removeItem('currentUser');
+    currentUser = null;
+    updateUserProfile();
+    showToast('You have been signed out successfully', 'success');
+}
+
+// Add new product (for admin use)
+async function addProduct(productData) {
+    try {
+        const response = await fetch(`${API_URL}/products`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(productData)
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to add product');
+        }
+        
+        const newProduct = await response.json();
+        menuItems.push(newProduct);
+        displayMenuItems();
+        showToast('Product added successfully!', 'success');
+    } catch (error) {
+        console.error('Error adding product:', error);
+        showToast('Error adding product. Please try again.', 'danger');
+    }
+}
+
+// Update product (for admin use)
+async function updateProduct(productId, productData) {
+    try {
+        const response = await fetch(`${API_URL}/products/${productId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(productData)
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to update product');
+        }
+        
+        const updatedProduct = await response.json();
+        const index = menuItems.findIndex(item => item.id === productId);
+        if (index !== -1) {
+            menuItems[index] = updatedProduct;
+            displayMenuItems();
+        }
+        showToast('Product updated successfully!', 'success');
+    } catch (error) {
+        console.error('Error updating product:', error);
+        showToast('Error updating product. Please try again.', 'danger');
+    }
+}
+
+// Delete product (for admin use)
+async function deleteProduct(productId) {
+    try {
+        const response = await fetch(`${API_URL}/products/${productId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to delete product');
+        }
+        
+        menuItems = menuItems.filter(item => item.id !== productId);
+        displayMenuItems();
+        showToast('Product deleted successfully!', 'success');
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        showToast('Error deleting product. Please try again.', 'danger');
+    }
+}
 
 // DOM Elements
 const menuItemsContainer = document.getElementById('menuItems');
@@ -15,21 +149,33 @@ const orderForm = document.getElementById('orderForm');
 const showTutorialBtn = document.getElementById('showTutorialBtn');
 const tutorialModal = new bootstrap.Modal(document.getElementById('tutorialModal'));
 const useCurrentLocation = document.getElementById('useCurrentLocation');
-    const locationStatus = document.getElementById('locationStatus');
+const locationStatus = document.getElementById('locationStatus');
 const searchInput = document.getElementById('searchInput');
 const searchButton = document.getElementById('searchButton');
+const categoryButtons = document.querySelectorAll('.category-filters .btn');
+const signOutLink = document.getElementById('signOutLink');
 
-// Initialize the page
-function initializePage() {
-    displayMenuItems();
-    updateCart();
-    setupEventListeners();
-}
+let currentCategory = 'all';
+let searchTerm = '';
 
 // Display menu items
-function displayMenuItems(filteredItems = null) {
-    const items = filteredItems || menuItems;
-    menuItemsContainer.innerHTML = items.map(item => `
+function displayMenuItems() {
+    let filteredItems = menuItems;
+    
+    // Apply category filter
+    if (currentCategory !== 'all') {
+        filteredItems = filteredItems.filter(item => item.category === currentCategory);
+    }
+    
+    // Apply search filter
+    if (searchTerm) {
+        filteredItems = filteredItems.filter(item => 
+            item.name.toLowerCase().includes(searchTerm) ||
+            item.description.toLowerCase().includes(searchTerm)
+        );
+    }
+
+    menuItemsContainer.innerHTML = filteredItems.map(item => `
         <div class="col-md-3 mb-4">
             <div class="product-card">
                 <img src="${item.image}" class="product-image" alt="${item.name}">
@@ -59,23 +205,22 @@ function getCartItemQuantity(itemId) {
 
 // Search functionality
 function searchProducts() {
-    const searchTerm = searchInput.value.toLowerCase().trim();
-    if (searchTerm === '') {
-        displayMenuItems();
-        return;
-    }
+    searchTerm = searchInput.value.toLowerCase().trim();
+    displayMenuItems();
+}
 
-    const filteredItems = menuItems.filter(item => 
-        item.name.toLowerCase().includes(searchTerm) ||
-        item.description.toLowerCase().includes(searchTerm)
-    );
-    
-    displayMenuItems(filteredItems);
+// Category filter functionality
+function filterByCategory(category) {
+    currentCategory = category;
+    categoryButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.category === category);
+    });
+    displayMenuItems();
 }
 
 // Add item to cart
 function addToCart(itemId) {
-        const item = menuItems.find(item => item.id === itemId);
+    const item = menuItems.find(item => item.id === itemId);
     if (item) {
         const cartItem = cart.find(cartItem => cartItem.id === itemId);
         if (cartItem) {
@@ -124,7 +269,7 @@ function updateCart() {
 // Update item quantity in cart
 function updateQuantity(itemId, newQuantity) {
     if (newQuantity <= 0) {
-    cart = cart.filter(item => item.id !== itemId);
+        cart = cart.filter(item => item.id !== itemId);
     } else {
         const item = cart.find(item => item.id === itemId);
         if (item) {
@@ -144,17 +289,27 @@ function setupEventListeners() {
     // Cart button click
     cartBtn.addEventListener('click', () => {
         cartPanel.classList.add('active');
+        document.body.style.overflow = 'hidden';
     });
 
     // Close cart button click
     closeCartBtn.addEventListener('click', () => {
         cartPanel.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+
+    // Close cart when clicking outside
+    document.addEventListener('click', (e) => {
+        if (e.target === cartPanel) {
+            cartPanel.classList.remove('active');
+            document.body.style.overflow = '';
+        }
     });
 
     // Order form submission
     orderForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        placeOrder();
+        placeOrder(e);
     });
 
     // Tutorial button click
@@ -162,7 +317,7 @@ function setupEventListeners() {
         showTutorial();
     });
 
-    // Current location checkbox
+    // Use current location checkbox
     useCurrentLocation.addEventListener('change', () => {
         if (useCurrentLocation.checked) {
             getCurrentLocation();
@@ -171,45 +326,101 @@ function setupEventListeners() {
         }
     });
 
-    // Search functionality
-    searchInput.addEventListener('input', searchProducts);
+    // Search button click
     searchButton.addEventListener('click', searchProducts);
+
+    // Search input enter key
+    searchInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+            searchProducts();
+        }
+    });
+
+    // Category filter buttons
+    categoryButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterByCategory(btn.dataset.category);
+        });
+    });
+
+    // Sign out link
+    if (signOutLink) {
+        signOutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            signOut();
+        });
+    }
 }
 
-// Place order
-function placeOrder() {
+// Calculate total price of cart
+function calculateTotal() {
+    return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+}
+
+// Function to send WhatsApp message
+async function sendWhatsAppMessage(orderDetails) {
+    const phoneNumber = '917569226048'; // WhatsApp number without + symbol
+    const message = `New Order Details:
+Order ID: ${orderDetails.orderId}
+Customer: ${orderDetails.customerName}
+Phone: ${orderDetails.customerPhone}
+Address: ${orderDetails.deliveryAddress}
+Items:
+${orderDetails.items.map(item => `- ${item.name} x ${item.quantity} (₹${item.price * item.quantity})`).join('\n')}
+Total Amount: ₹${orderDetails.totalAmount}`;
+
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+}
+
+// Place order function
+async function placeOrder(event) {
+    event.preventDefault();
+    
     if (cart.length === 0) {
         showToast('Your cart is empty!', 'warning');
         return;
     }
 
+    const customerName = document.getElementById('customerName').value;
+    const customerPhone = document.getElementById('customerPhone').value;
+    const customerEmail = document.getElementById('customerEmail').value;
+    const deliveryAddress = document.getElementById('deliveryAddress').value;
+    const doorNumber = document.getElementById('doorNumber').value;
+    const landmark = document.getElementById('landmark').value;
+    const deliveryInstructions = document.getElementById('deliveryInstructions').value;
+
+    // Validate required fields
+    if (!customerName || !customerPhone || !deliveryAddress || !doorNumber) {
+        showToast('Please fill in all required fields', 'warning');
+        return;
+    }
+
+    // Create order object
     const order = {
-        id: orderId++,
+        orderId: orderId++,
+        customerName,
+        customerPhone,
+        customerEmail,
+        deliveryAddress: `${deliveryAddress}, Door/Apt: ${doorNumber}${landmark ? `, Landmark: ${landmark}` : ''}`,
+        deliveryInstructions,
         items: cart,
-        total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
-        customerName: document.getElementById('customerName').value,
-        customerPhone: document.getElementById('customerPhone').value,
-        customerEmail: document.getElementById('customerEmail').value,
-        deliveryAddress: document.getElementById('deliveryAddress').value,
-        doorNumber: document.getElementById('doorNumber').value,
-        landmark: document.getElementById('landmark').value,
-        deliveryInstructions: document.getElementById('deliveryInstructions').value,
-        status: 'Pending',
-        date: new Date().toISOString()
+        totalAmount: calculateTotal(),
+        status: 'pending',
+        timestamp: new Date().toISOString()
     };
 
-    // Get orders from localStorage
-    const orders = JSON.parse(localStorage.getItem('orders')) || [];
-    orders.push(order);
-    localStorage.setItem('orders', JSON.stringify(orders));
+    // Send order details via WhatsApp
+    await sendWhatsAppMessage(order);
 
-    // Clear cart
+    // Clear cart and show success message
     cart = [];
+    localStorage.setItem('cart', JSON.stringify(cart));
     updateCart();
-    cartPanel.classList.remove('active');
+    cartPanel.classList.remove('show');
+    
+    showToast('Order placed successfully! We will contact you shortly.', 'success');
     orderForm.reset();
-
-    showToast('Order placed successfully!', 'success');
 }
 
 // Get current location
@@ -236,24 +447,34 @@ function getCurrentLocation() {
 function showTutorial() {
     const tutorialSteps = [
         {
-            title: 'Welcome to Delvery!',
-            content: 'Let us show you how to order delicious food from our menu.'
+            title: 'Welcome to Delvery! 🎉',
+            content: 'Let us show you how to order delicious food from our menu.',
+            highlight: null
         },
         {
-            title: 'Browse the Menu',
-            content: 'Scroll through our menu to see all available items. Each item shows its description and price.'
+            title: 'Browse the Menu 🍽️',
+            content: 'Scroll through our menu to see all available items. Each item shows its description and price. You can also use the search bar to find specific items.',
+            highlight: '#menu'
         },
         {
-            title: 'Add to Cart',
-            content: 'Click the "Add to Cart" button on any item you want to order. You can add multiple items.'
+            title: 'Add to Cart 🛒',
+            content: 'Click the "Add to Cart" button on any item you want to order. You can adjust the quantity using the + and - buttons.',
+            highlight: '.product-card'
         },
         {
-            title: 'View Your Cart',
-            content: 'Click the cart icon in the top right to view your order. You can adjust quantities or remove items.'
+            title: 'View Your Cart 📋',
+            content: 'Click the cart icon in the top right to view your order. You can adjust quantities or remove items.',
+            highlight: '#cartBtn'
         },
         {
-            title: 'Place Your Order',
-            content: 'Fill in your delivery details and click "Place Order" to complete your purchase.'
+            title: 'Place Your Order 📝',
+            content: 'Fill in your delivery details and click "Place Order" to complete your purchase. You can also use your current location for faster delivery.',
+            highlight: '#orderForm'
+        },
+        {
+            title: 'Track Your Order 🚚',
+            content: 'After placing your order, you\'ll receive a confirmation with your order details and estimated delivery time.',
+            highlight: null
         }
     ];
 
@@ -264,9 +485,29 @@ function showTutorial() {
     const finishBtn = document.getElementById('finishTutorial');
 
     function showStep(step) {
+        // Remove previous highlight
+        const previousHighlight = document.querySelector('.tutorial-highlight');
+        if (previousHighlight) {
+            previousHighlight.classList.remove('tutorial-highlight');
+        }
+
+        // Add new highlight if specified
+        if (tutorialSteps[step].highlight) {
+            const elementToHighlight = document.querySelector(tutorialSteps[step].highlight);
+            if (elementToHighlight) {
+                elementToHighlight.classList.add('tutorial-highlight');
+                elementToHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
         tutorialStepsContainer.innerHTML = `
-            <h4>${tutorialSteps[step].title}</h4>
-            <p>${tutorialSteps[step].content}</p>
+            <div class="tutorial-step-content">
+                <h4 class="tutorial-title">${tutorialSteps[step].title}</h4>
+                <p class="tutorial-text">${tutorialSteps[step].content}</p>
+                <div class="tutorial-progress">
+                    Step ${step + 1} of ${tutorialSteps.length}
+                </div>
+            </div>
         `;
 
         prevStepBtn.style.display = step === 0 ? 'none' : 'inline-block';
@@ -290,6 +531,11 @@ function showTutorial() {
 
     finishBtn.onclick = () => {
         tutorialModal.hide();
+        // Remove highlight
+        const highlight = document.querySelector('.tutorial-highlight');
+        if (highlight) {
+            highlight.classList.remove('tutorial-highlight');
+        }
     };
 
     showStep(currentStep);

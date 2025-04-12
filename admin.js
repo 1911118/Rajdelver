@@ -15,82 +15,40 @@ async function hashPassword(password) {
         .join('');
 }
 
-// Default menu items that will always be available
-const DEFAULT_MENU_ITEMS = [
+// Get menu items from localStorage or use default items
+let menuItems = JSON.parse(localStorage.getItem('menuItems')) || [
     {
         id: 1,
-        name: "MILK - blue color",
-        description: "170ml sangum milk",
-        price: 28,
-        image: "https://5.imimg.com/data5/SELLER/Default/2021/12/MI/CM/OC/3823480/sangam-milk-blue-500x500.jpg"
+        name: "Margherita Pizza",
+        description: "Classic tomato sauce with mozzarella cheese and fresh basil",
+        price: 299,
+        image: "https://images.unsplash.com/photo-1604382355076-af4b0eb60143?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
     },
     {
         id: 2,
-        name: "MILK - Red color",
-        description: "500ml #Red color",
-        price: 35,
-        image: "https://5.imimg.com/data5/SELLER/Default/2022/9/RW/EM/BI/3823480/sangam-milk-red.jpg"
+        name: "Chicken Burger",
+        description: "Grilled chicken patty with lettuce, tomato, and special sauce",
+        price: 199,
+        image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
     },
     {
         id: 3,
-        name: "Curd",
-        description: "small",
-        price: 10,
-        image: "https://5.imimg.com/data5/SELLER/Default/2021/12/UY/ON/MY/3823480/sangam-curd-500x500.jpg"
+        name: "Pasta Alfredo",
+        description: "Creamy Alfredo sauce with fettuccine pasta and parmesan cheese",
+        price: 249,
+        image: "https://images.unsplash.com/photo-1645112411341-6c1f3c1c5c4f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
     },
     {
         id: 4,
-        name: "Butter Milk",
-        description: "200ml fresh buttermilk",
-        price: 15,
-        image: "https://5.imimg.com/data5/SELLER/Default/2022/1/ZG/VM/WC/3823480/buttermilk-500x500.jpg"
-    },
-    {
-        id: 5,
-        name: "Lassi",
-        description: "Sweet lassi 200ml",
-        price: 25,
-        image: "https://5.imimg.com/data5/SELLER/Default/2022/1/DK/DN/OJ/3823480/lassi-500x500.jpg"
+        name: "Chicken Wings",
+        description: "Crispy chicken wings with your choice of sauce",
+        price: 399,
+        image: "https://images.unsplash.com/photo-1527477396000-e27163b481c2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
     }
 ];
 
-// Initialize menu items with default items, then merge with localStorage if any exist
-let menuItems = [...DEFAULT_MENU_ITEMS];
-const storedItems = JSON.parse(localStorage.getItem('menuItems')) || [];
-
-// Merge stored items with default items, avoiding duplicates by ID
-storedItems.forEach(storedItem => {
-    const exists = menuItems.some(item => item.id === storedItem.id);
-    if (!exists) {
-        menuItems.push(storedItem);
-    }
-});
-
 // Get orders from localStorage
 let orders = JSON.parse(localStorage.getItem('orders')) || [];
-
-// Reset to default items function
-function resetToDefaultItems() {
-    if (confirm('Are you sure you want to reset to default items? This will remove all custom items.')) {
-        menuItems = [...DEFAULT_MENU_ITEMS];
-        saveMenuItems();
-        displayMenuItems();
-        updateDashboardStats();
-        showToast('Menu reset to default items');
-    }
-}
-
-// Add reset button to the admin panel
-function addResetButton() {
-    const adminHeader = document.querySelector('.card-header');
-    if (adminHeader) {
-        const resetButton = document.createElement('button');
-        resetButton.className = 'btn btn-warning float-end';
-        resetButton.innerHTML = '<i class="fas fa-undo"></i> Reset to Default Items';
-        resetButton.onclick = resetToDefaultItems;
-        adminHeader.appendChild(resetButton);
-    }
-}
 
 // DOM Elements
 const loginForm = document.getElementById('loginForm');
@@ -105,6 +63,21 @@ const itemImageInput = document.getElementById('itemImage');
 const totalProducts = document.getElementById('totalProducts');
 const totalOrders = document.getElementById('totalOrders');
 const totalRevenue = document.getElementById('totalRevenue');
+
+// API endpoints
+const API_URL = 'http://localhost:3000/api';
+
+// DOM Elements
+const productForm = document.getElementById('productForm');
+const productsList = document.getElementById('productsList');
+const productId = document.getElementById('productId');
+const productName = document.getElementById('productName');
+const productDescription = document.getElementById('productDescription');
+const productPrice = document.getElementById('productPrice');
+const productCategory = document.getElementById('productCategory');
+const productImage = document.getElementById('productImage');
+const submitBtn = document.getElementById('submitBtn');
+const resetBtn = document.getElementById('resetBtn');
 
 // Check if user is logged in
 function checkAuth() {
@@ -157,7 +130,6 @@ function initializeAdmin() {
     displayOrders();
     updateDashboardStats();
     setupEventListeners();
-    addResetButton(); // Add the reset button
 }
 
 // Display menu items
@@ -242,6 +214,10 @@ function setupEventListeners() {
             imagePreview.classList.add('d-none');
         }
     });
+
+    productForm.addEventListener('submit', handleProductSubmit);
+    resetBtn.addEventListener('click', resetForm);
+    productImage.addEventListener('input', updateImagePreview);
 }
 
 // Add new item
@@ -370,4 +346,163 @@ function showToast(message, type = 'success') {
 }
 
 // Initialize the admin panel when the page loads
-document.addEventListener('DOMContentLoaded', checkAuth); 
+document.addEventListener('DOMContentLoaded', checkAuth);
+
+// Initialize page
+async function initializePage() {
+    await loadProducts();
+    setupEventListeners();
+}
+
+// Load products
+async function loadProducts() {
+    try {
+        const response = await fetch(`${API_URL}/products`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch products');
+        }
+        const products = await response.json();
+        displayProducts(products);
+    } catch (error) {
+        console.error('Error loading products:', error);
+        showToast('Error loading products. Please try again later.', 'danger');
+    }
+}
+
+// Display products
+function displayProducts(products) {
+    productsList.innerHTML = products.map(product => `
+        <tr>
+            <td>
+                <img src="${product.image}" alt="${product.name}" class="product-thumbnail">
+            </td>
+            <td>${product.name}</td>
+            <td>${product.category}</td>
+            <td>₹${product.price}</td>
+            <td>
+                <button class="btn btn-sm btn-primary" onclick="editProduct(${product.id})">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Add/Update product
+async function handleProductSubmit(e) {
+    e.preventDefault();
+
+    const productData = {
+        name: productName.value,
+        description: productDescription.value,
+        price: parseInt(productPrice.value),
+        category: productCategory.value,
+        image: productImage.value
+    };
+
+    try {
+        let response;
+        if (productId.value) {
+            // Update existing product
+            response = await fetch(`${API_URL}/products/${productId.value}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(productData)
+            });
+        } else {
+            // Add new product
+            response = await fetch(`${API_URL}/products`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(productData)
+            });
+        }
+
+        if (!response.ok) {
+            throw new Error('Failed to save product');
+        }
+
+        await loadProducts();
+        resetForm();
+        showToast(`Product ${productId.value ? 'updated' : 'added'} successfully!`, 'success');
+    } catch (error) {
+        console.error('Error saving product:', error);
+        showToast('Error saving product. Please try again.', 'danger');
+    }
+}
+
+// Edit product
+async function editProduct(id) {
+    try {
+        const response = await fetch(`${API_URL}/products/${id}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch product');
+        }
+        const product = await response.json();
+        
+        productId.value = product.id;
+        productName.value = product.name;
+        productDescription.value = product.description;
+        productPrice.value = product.price;
+        productCategory.value = product.category;
+        productImage.value = product.image;
+        
+        updateImagePreview();
+        submitBtn.textContent = 'Update Product';
+        productForm.scrollIntoView({ behavior: 'smooth' });
+    } catch (error) {
+        console.error('Error fetching product:', error);
+        showToast('Error fetching product details. Please try again.', 'danger');
+    }
+}
+
+// Delete product
+async function deleteProduct(id) {
+    if (!confirm('Are you sure you want to delete this product?')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/products/${id}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to delete product');
+        }
+        
+        await loadProducts();
+        showToast('Product deleted successfully!', 'success');
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        showToast('Error deleting product. Please try again.', 'danger');
+    }
+}
+
+// Reset form
+function resetForm() {
+    productId.value = '';
+    productForm.reset();
+    imagePreview.classList.add('d-none');
+    submitBtn.textContent = 'Add Product';
+}
+
+// Update image preview
+function updateImagePreview() {
+    if (productImage.value) {
+        imagePreview.src = productImage.value;
+        imagePreview.classList.remove('d-none');
+    } else {
+        imagePreview.classList.add('d-none');
+    }
+}
+
+// Initialize the page when it loads
+document.addEventListener('DOMContentLoaded', initializePage); 

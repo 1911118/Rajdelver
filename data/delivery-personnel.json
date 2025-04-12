@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "email": "delivery1@example.com",
+    "password": "password123",
+    "name": "John Doe",
+    "phone": "1234567890",
+    "isAvailable": false,
+    "currentLocation": {
+      "latitude": 16.300750877405168,
+      "longitude": 80.41778237801238
+    }
+  }
+]

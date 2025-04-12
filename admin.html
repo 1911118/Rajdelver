@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delvery Admin Panel</title>
+    <title>Delvery Admin - Product Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin-styles.css">
     <style>
         .admin-container {
             padding: 20px;
@@ -38,144 +38,88 @@
     </style>
 </head>
 <body>
-    <!-- Login Form -->
-    <div id="loginSection" class="container">
-        <form id="loginForm" class="bg-white">
-            <h2 class="text-center mb-4">Admin Login</h2>
-            <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="username" required>
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Login</button>
-        </form>
-    </div>
-
-    <!-- Admin Panel Content -->
-    <div id="adminContent" class="admin-content">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <div class="container">
-                <a class="navbar-brand" href="#">Delvery Admin Panel</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="index.html" target="_blank">View Website</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" id="logoutBtn">Logout</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-
-        <div class="admin-container">
-            <div class="container">
-                <div class="row mb-4">
-                    <div class="col-md-4">
-                        <div class="card bg-primary text-white">
-                            <div class="card-body">
-                                <h5 class="card-title">Total Products</h5>
-                                <h2 id="totalProducts">0</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card bg-success text-white">
-                            <div class="card-body">
-                                <h5 class="card-title">Total Orders</h5>
-                                <h2 id="totalOrders">0</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card bg-info text-white">
-                            <div class="card-body">
-                                <h5 class="card-title">Revenue</h5>
-                                <h2 id="totalRevenue">₹0</h2>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">Delvery Admin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" id="products-tab" data-bs-toggle="tab" href="#products" role="tab">Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab">Orders</a>
+                        <a class="nav-link" href="index.html">View Site</a>
                     </li>
                 </ul>
+            </div>
+        </div>
+    </nav>
 
-                <div class="tab-content" id="adminTabContent">
-                    <!-- Products Tab -->
-                    <div class="tab-pane fade show active" id="products" role="tabpanel">
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h4>Add New Item</h4>
-                            </div>
-                            <div class="card-body">
-                                <form id="addItemForm">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="itemName" class="form-label">Item Name</label>
-                                                <input type="text" class="form-control" id="itemName" required>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="itemDescription" class="form-label">Description</label>
-                                                <textarea class="form-control" id="itemDescription" required></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="itemPrice" class="form-label">Price (₹)</label>
-                                                <input type="number" class="form-control" id="itemPrice" required>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="itemImage" class="form-label">Image URL</label>
-                                                <input type="url" class="form-control" id="itemImage" required>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Image Preview</label>
-                                                <img id="imagePreview" class="preview-image d-none" alt="Preview">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Add Item</button>
-                                </form>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Current Menu Items</h4>
-                            </div>
-                            <div class="card-body">
-                                <div id="menuItemsList">
-                                    <!-- Items will be dynamically added here -->
-                                </div>
-                            </div>
-                        </div>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Add/Edit Product</h5>
                     </div>
-
-                    <!-- Orders Tab -->
-                    <div class="tab-pane fade" id="orders" role="tabpanel">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Recent Orders</h4>
+                    <div class="card-body">
+                        <form id="productForm">
+                            <input type="hidden" id="productId">
+                            <div class="mb-3">
+                                <label for="productName" class="form-label">Product Name</label>
+                                <input type="text" class="form-control" id="productName" required>
                             </div>
-                            <div class="card-body">
-                                <div id="ordersList">
-                                    <!-- Orders will be dynamically added here -->
-                                </div>
+                            <div class="mb-3">
+                                <label for="productDescription" class="form-label">Description</label>
+                                <textarea class="form-control" id="productDescription" rows="3" required></textarea>
                             </div>
+                            <div class="mb-3">
+                                <label for="productPrice" class="form-label">Price (₹)</label>
+                                <input type="number" class="form-control" id="productPrice" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="productCategory" class="form-label">Category</label>
+                                <select class="form-select" id="productCategory" required>
+                                    <option value="pizza">Pizza</option>
+                                    <option value="burger">Burger</option>
+                                    <option value="pasta">Pasta</option>
+                                    <option value="wings">Wings</option>
+                                    <option value="drinks">Drinks</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="productImage" class="form-label">Image URL</label>
+                                <input type="url" class="form-control" id="productImage" required>
+                            </div>
+                            <div class="mb-3">
+                                <img id="imagePreview" class="img-preview d-none" alt="Preview">
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">Add Product</button>
+                            <button type="button" class="btn btn-secondary" id="resetBtn">Reset</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Products List</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Image</th>
+                                        <th>Name</th>
+                                        <th>Category</th>
+                                        <th>Price</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productsList">
+                                    <!-- Products will be dynamically added here -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

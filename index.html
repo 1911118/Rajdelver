@@ -17,7 +17,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="#home">Home</a>
                     </li>
@@ -36,10 +36,29 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="product-management.html">
+                            <i class="fas fa-box"></i> Manage Products
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
                         <a class="nav-link" href="#" id="cartBtn">
                             <i class="fas fa-shopping-cart"></i>
                             <span class="badge bg-danger" id="cartCount">0</span>
                         </a>
+                    </li>
+                    <li class="nav-item dropdown" id="userProfileDropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user"></i> <span id="userName">Sign In</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" id="userDropdownMenu">
+                            <li><a class="dropdown-item" href="signin.html" id="signInLink">Sign In</a></li>
+                            <li><a class="dropdown-item" href="signup.html" id="signUpLink">Sign Up</a></li>
+                            <li><hr class="dropdown-divider" id="dropdownDivider"></li>
+                            <li><a class="dropdown-item" href="profile.html" id="profileLink">My Profile</a></li>
+                            <li><a class="dropdown-item" href="#" id="signOutLink">Sign Out</a></li>
+                        </ul>
                     </li>
                 </ul>
             </div>
@@ -70,6 +89,26 @@
                         <button class="btn btn-primary" type="button" id="searchButton">
                             <i class="fas fa-search"></i> Search
                         </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="category-filters text-center">
+                        <button class="btn btn-outline-primary active" data-category="all">All</button>
+                        <button class="btn btn-outline-primary" data-category="vegetables">Vegetables & Greens</button>
+                        <button class="btn btn-outline-primary" data-category="dairy">Dairy Products</button>
+                        <button class="btn btn-outline-primary" data-category="meat">Meat & Poultry</button>
+                        <button class="btn btn-outline-primary" data-category="pulses">Pulses</button>
+                        <button class="btn btn-outline-primary" data-category="grains">Grains & Flours</button>
+                        <button class="btn btn-outline-primary" data-category="spices">Spices & Condiments</button>
+                        <button class="btn btn-outline-primary" data-category="snacks">Snacks & Bakery</button>
+                        <button class="btn btn-outline-primary" data-category="oils">Oils</button>
+                        <button class="btn btn-outline-primary" data-category="cleaning">Cleaning & Household</button>
+                        <button class="btn btn-outline-primary" data-category="puja">Puja & Religious Items</button>
+                        <button class="btn btn-outline-primary" data-category="newspapers">Newspapers</button>
+                        <button class="btn btn-outline-primary" data-category="furniture">Furniture & Mattress</button>
+                        <button class="btn btn-outline-primary" data-category="dryfruits">Dry Fruits</button>
                     </div>
                 </div>
             </div>

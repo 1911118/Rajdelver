@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Grocery Store</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin-right: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-avatar .upload-btn {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .profile-avatar:hover .upload-btn {
+            opacity: 1;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-info h1 {
+            margin: 0;
+            color: #333;
+        }
+
+        .profile-info p {
+            margin: 0.5rem 0;
+            color: #666;
+        }
+
+        .profile-section {
+            margin-bottom: 2rem;
+        }
+
+        .profile-section h2 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .edit-form {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .edit-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-right: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .order-history {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .order-history th,
+        .order-history td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-history th {
+            background: #f8f8f8;
+            font-weight: 600;
+        }
+
+        .order-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .order-status i {
+            font-size: 1rem;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-processing {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .status-shipped {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-delivered {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .order-details {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #666;
+        }
+
+        .order-items-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .order-items-list li {
+            margin-bottom: 0.25rem;
+        }
+
+        .order-total {
+            font-weight: 600;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .profile-container {
+                margin: 1rem;
+                padding: 1rem;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-avatar {
+                margin: 0 0 1rem 0;
+            }
+
+            .order-history {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <img id="profilePhoto" src="" alt="Profile Photo" style="display: none;">
+                <span id="profileInitials"></span>
+                <div class="upload-btn" onclick="document.getElementById('photoInput').click()">
+                    Change Photo
+                </div>
+                <input type="file" id="photoInput" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
+            </div>
+            <div class="profile-info">
+                <h1 id="profileName">Loading...</h1>
+                <p id="profileEmail">Loading...</p>
+                <p id="profilePhone">Loading...</p>
+                <p id="profileAddress">Loading...</p>
+                <button class="btn btn-primary" onclick="toggleEditForm()">Edit Profile</button>
+            </div>
+        </div>
+
+        <div class="edit-form" id="editForm">
+            <div class="form-group">
+                <label for="editName">Full Name</label>
+                <input type="text" id="editName" required>
+            </div>
+            <div class="form-group">
+                <label for="editEmail">Email</label>
+                <input type="email" id="editEmail" required>
+            </div>
+            <div class="form-group">
+                <label for="editPhone">Phone</label>
+                <input type="tel" id="editPhone" required>
+            </div>
+            <div class="form-group">
+                <label for="editAddress">Address</label>
+                <textarea id="editAddress" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="editDoorNumber">Door Number</label>
+                <input type="text" id="editDoorNumber" required>
+            </div>
+            <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+            <button class="btn btn-secondary" onclick="toggleEditForm()">Cancel</button>
+        </div>
+
+        <div class="profile-section">
+            <h2>Order History</h2>
+            <table class="order-history">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="orderHistoryBody">
+                    <!-- Order history will be populated here -->
+                </tbody>
+            </table>
+        </div>
+
+        <button class="btn btn-danger" onclick="signOut()">Sign Out</button>
+    </div>
+
+    <script>
+        // Get current user from localStorage
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+        // Check if user is logged in
+        if (!currentUser) {
+            window.location.href = 'index.html';
+        }
+
+        // Display user details
+        document.getElementById('profileName').textContent = currentUser.fullName;
+        document.getElementById('profileEmail').textContent = currentUser.email;
+        document.getElementById('profilePhone').textContent = currentUser.phone;
+        document.getElementById('profileAddress').textContent = `${currentUser.address}, Door No: ${currentUser.doorNumber}`;
+        
+        // Set profile photo if exists
+        if (currentUser.photo) {
+            document.getElementById('profilePhoto').src = currentUser.photo;
+            document.getElementById('profilePhoto').style.display = 'block';
+            document.getElementById('profileInitials').style.display = 'none';
+        } else {
+            // Set profile initials
+            const initials = currentUser.fullName
+                .split(' ')
+                .map(name => name[0])
+                .join('')
+                .toUpperCase();
+            document.getElementById('profileInitials').textContent = initials;
+        }
+
+        // Handle photo upload
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const photoUrl = e.target.result;
+                    document.getElementById('profilePhoto').src = photoUrl;
+                    document.getElementById('profilePhoto').style.display = 'block';
+                    document.getElementById('profileInitials').style.display = 'none';
+                    
+                    // Save photo to user profile
+                    currentUser.photo = photoUrl;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Toggle edit form
+        function toggleEditForm() {
+            const editForm = document.getElementById('editForm');
+            editForm.classList.toggle('active');
+            
+            if (editForm.classList.contains('active')) {
+                // Populate form with current values
+                document.getElementById('editName').value = currentUser.fullName;
+                document.getElementById('editEmail').value = currentUser.email;
+                document.getElementById('editPhone').value = currentUser.phone;
+                document.getElementById('editAddress').value = currentUser.address;
+                document.getElementById('editDoorNumber').value = currentUser.doorNumber;
+            }
+        }
+
+        // Save profile changes
+        function saveProfile() {
+            currentUser.fullName = document.getElementById('editName').value;
+            currentUser.email = document.getElementById('editEmail').value;
+            currentUser.phone = document.getElementById('editPhone').value;
+            currentUser.address = document.getElementById('editAddress').value;
+            currentUser.doorNumber = document.getElementById('editDoorNumber').value;
+
+            // Update localStorage
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+            // Update display
+            document.getElementById('profileName').textContent = currentUser.fullName;
+            document.getElementById('profileEmail').textContent = currentUser.email;
+            document.getElementById('profilePhone').textContent = currentUser.phone;
+            document.getElementById('profileAddress').textContent = `${currentUser.address}, Door No: ${currentUser.doorNumber}`;
+
+            // Hide edit form
+            toggleEditForm();
+        }
+
+        // Load and display order history
+        function loadOrderHistory() {
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const userOrders = orders.filter(order => order.customerEmail === currentUser.email);
+            const orderHistoryBody = document.getElementById('orderHistoryBody');
+            
+            if (userOrders.length === 0) {
+                orderHistoryBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No orders found</td></tr>';
+                return;
+            }
+
+            orderHistoryBody.innerHTML = userOrders.map(order => {
+                // Get status icon and text
+                let statusIcon, statusText;
+                switch(order.status.toLowerCase()) {
+                    case 'pending':
+                        statusIcon = 'fas fa-clock';
+                        statusText = 'Pending';
+                        break;
+                    case 'processing':
+                        statusIcon = 'fas fa-cog';
+                        statusText = 'Processing';
+                        break;
+                    case 'shipped':
+                        statusIcon = 'fas fa-truck';
+                        statusText = 'Shipped';
+                        break;
+                    case 'delivered':
+                        statusIcon = 'fas fa-check-circle';
+                        statusText = 'Delivered';
+                        break;
+                    case 'cancelled':
+                        statusIcon = 'fas fa-times-circle';
+                        statusText = 'Cancelled';
+                        break;
+                    default:
+                        statusIcon = 'fas fa-info-circle';
+                        statusText = order.status;
+                }
+
+                // Format items list
+                const itemsList = order.items.map(item => 
+                    `<li>${item.name} x ${item.quantity} - ₹${(item.price * item.quantity).toFixed(2)}</li>`
+                ).join('');
+
+                return `
+                    <tr>
+                        <td>#${order.id}</td>
+                        <td>${new Date(order.date).toLocaleDateString()}</td>
+                        <td>
+                            <ul class="order-items-list">
+                                ${itemsList}
+                            </ul>
+                        </td>
+                        <td class="order-total">₹${order.total.toFixed(2)}</td>
+                        <td>
+                            <span class="order-status status-${order.status.toLowerCase()}">
+                                <i class="${statusIcon}"></i>
+                                ${statusText}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Sign out function
+        function signOut() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        // Load order history when page loads
+        loadOrderHistory();
+    </script>
+</body>
+</html> 

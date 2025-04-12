@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "name": "zx",
+    "description": " bc",
+    "price": 45.3,
+    "category": "vegetables",
+    "image": "https://th.bing.com/th/id/OSK.HEROAd4ETdyEPcufhWwT9p92ztSNEClqW3aTkoja5sr-mFc?w=312&h=200&c=7&rs=1&o=6&dpr=1.5&pid=SANGAM"
+  },
+  {
+    "id": 2,
+    "name": "banana",
+    "description": "BANANA",
+    "price": 1,
+    "category": "vegetables",
+    "image": "https://th.bing.com/th/id/OSK.HEROlQwq-MqJurmEPVYmkdCbw0m3cgZM0brBFvz8RHzaL00?w=296&h=176&c=1&rs=2&o=6&dpr=1.5&pid=SANGAM"
+  }
+]
