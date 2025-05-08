@@ -107,7 +107,7 @@ let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 const API_URL = '/api';
 
 // Menu items will be fetched from server
-let menuItems = [];
+//let menuItems = [];
 
 // Get menu items from server
 async function fetchMenuItems() {
