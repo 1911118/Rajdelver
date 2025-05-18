@@ -3,7 +3,7 @@ const menuItems = [
   {
     "id": 1,
     "name": "Apple",
-    "description": "1kg",
+    "description": "10000000kg",
     "price": 30,
     "category": "vegetables",
     "image": "https://th.bing.com/th/id/OIP.-mikoRBfcR8SxPMcYdIezwHaHa?w=119&h=104&c=7&bgcl=9f92d2&r=0&o=6&dpr=1.5&pid=13.1"
