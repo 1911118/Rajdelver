@@ -2,7 +2,7 @@
 const menuItems = [
   {
     "id": 1,
-    "name": "Tamoto",
+    "name": "Apple",
     "description": "1kg",
     "price": 30,
     "category": "vegetables",
