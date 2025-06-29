@@ -2,7 +2,7 @@
 let products = [
   {
     "id": 1,
-    "name": "Tamoto",
+    "name": "Tomato",
     "description": "1kg",
     "price": 30,
     "category": "vegetables",
@@ -14,7 +14,7 @@ let products = [
     "description": "1kg",
     "price": 60,
     "category": "vegetables",
-    "image": "https://th.bing.com/th/id/R.a844ff9d69e5a8f987a8360b9d27f526?rik=M7L4PmlGJiywjQ&riu=http%3a%2f%2fseed2plant.in%2fcdn%2fshop%2fproducts%2fbiggreenchilliseeds.jpg%3fv%3d1606738066&ehk=PmAZm8fxrZP8pqdF5zn76dT4oHSy0B3bFInXgI4OehI%3d&risl=&pid=ImgRaw&r=0pr=1.5&pid=SANGAM"
+    "image": " https://th.bing.com/th/id/R.a844ff9d69e5a8f987a8360b9d27f526?rik=M7L4PmlGJiywjQ&riu=http%3a%2f%2fseed2plant.in%2fcdn%2fshop%2fproducts%2fbiggreenchilliseeds.jpg%3fv%3d1606738066&ehk=PmAZm8fxrZP8pqdF5zn76dT4oHSy0B3bFInXgI4OehI%3d&risl=&pid=ImgRaw&r=0pr=1.5&pid=SANGAM"
   },
   {
     "id": 3,
@@ -22,7 +22,7 @@ let products = [
     "description": "450ml",
     "price": 36,
     "category": "dairy",
-    "image": "https://www.bing.com/th/id/OIP.VWW1dsvpxAuCNRSvVerRWwHaHa?w=174&h=185&c=8&rs=1&qlt=90&o=6&dpr=1.5&pid=3.1&rm=2"
+    "image": " https://www.bing.com/th/id/OIP.VWW1dsvpxAuCNRSvVerRWwHaHa?w=174&h=185&c=8&rs=1&qlt=90&o=6&dpr=1.5&pid=3.1&rm=2"
   },
   {
     "id": 4,
@@ -30,7 +30,7 @@ let products = [
     "description": "170ml",
     "price": 10,
     "category": "dairy",
-    "image": "https://dayli.in/cdn/shop/files/12_e6032000-0c92-4c86-bb1d-a28656af2235.png?v=1699873114&width=1080"
+    "image": " https://dayli.in/cdn/shop/files/12_e6032000-0c92-4c86-bb1d-a28656af2235.png?v=1699873114&width=1080"
   },
   {
     "id": 5,
@@ -38,7 +38,7 @@ let products = [
     "description": "1 biscuit pack",
     "price": 10,
     "category": "snacks",
-    "image": "https://m.media-amazon.com/images/I/91g3Q7R0m1L._SX679_.jpg"
+    "image": " https://m.media-amazon.com/images/I/91g3Q7R0m1L._SX679_.jpg "
   },
   {
     "id": 6,
@@ -54,7 +54,7 @@ let products = [
     "description": "1 stick",
     "price": 15,
     "category": "vegetables",
-    "image": "https://syncwithnature.in/wp-content/uploads/2020/07/drumstick.png"
+    "image": " https://syncwithnature.in/wp-content/uploads/2020/07/drumstick.png "
   },
   {
     "id": 8,
@@ -70,7 +70,7 @@ let products = [
     "description": "1 pack",
     "price": 35,
     "category": "household",
-    "image": "https://m.media-amazon.com/images/I/51DbzXMb4jL._AC_UL480_FMwebp_QL65_.jpg"
+    "image": " https://m.media-amazon.com/images/I/51DbzXMb4jL._AC_UL480_FMwebp_QL65_.jpg "
   },
   {
     "id": 10,
@@ -82,11 +82,11 @@ let products = [
   },
   {
     "id": 11,
-    "name": "Sleep well (masquto repaler)",
+    "name": "Sleep well (mosquito repellent)",
     "description": "per piece",
     "price": 15,
     "category": "household",
-    "image": "https://5.imimg.com/data5/SELLER/Default/2020/9/GH/LA/WW/54315936/new-product-250x250.jpeg"
+    "image": " https://5.imimg.com/data5/SELLER/Default/2020/9/GH/LA/WW/54315936/new-product-250x250.jpeg "
   },
   {
     "id": 12,
@@ -94,7 +94,311 @@ let products = [
     "description": "1kg",
     "price": 700,
     "category": "spices",
-    "image": "https://cdn.shopify.com/s/files/1/1462/9838/products/com1807851585567Poshtik_Cumin_eee0a743-a579-4da9-834b-f5ef2c2c322c_580x@2x.png?v=1526694532"
+    "image": "https://cdn.shopify.com/s/files/1/1462/9838/products/com1807851585567Poshtik_Cumin_eee0a743-a579-4da9-834b-f5ef2c2c322c_580x @2x.png?v=1526694532"
+  },
+  {
+    "id": 13,
+    "name": "Onion",
+    "description": "1kg",
+    "price": 25,
+    "category": "vegetables",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Yellow_onions_with_white_background.jpg/1200px-Yellow_onions_with_white_background.jpg "
+  },
+  {
+    "id": 14,
+    "name": "Potato",
+    "description": "1kg",
+    "price": 20,
+    "category": "vegetables",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Potato_roseval.jpg/1200px-Potato_roseval.jpg "
+  },
+  {
+    "id": 15,
+    "name": "Carrot",
+    "description": "1kg",
+    "price": 40,
+    "category": "vegetables",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Whole_carrots_and_carrot_sticks.jpg/1200px-Whole_carrots_and_carrot_sticks.jpg "
+  },
+  {
+    "id": 16,
+    "name": "Cabbage",
+    "description": "1 piece",
+    "price": 25,
+    "category": "vegetables",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Cabbage_and_cross_section_on_white.jpg/1200px-Cabbage_and_cross_section_on_white.jpg "
+  },
+  {
+    "id": 17,
+    "name": "Capsicum",
+    "description": "1kg",
+    "price": 80,
+    "category": "vegetables",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Red_yellow_green_peppers.jpg/1200px-Red_yellow_green_peppers.jpg "
+  },
+  {
+    "id": 18,
+    "name": "Cauliflower",
+    "description": "1 piece",
+    "price": 30,
+    "category": "vegetables",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Cauliflower_Bundle.jpg/1200px-Cauliflower_Bundle.jpg "
+  },
+  {
+    "id": 19,
+    "name": "Brinjal",
+    "description": "1kg",
+    "price": 35,
+    "category": "vegetables",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Eggplant_-_whole_and_sliced.jpg/1200px-Eggplant_-_whole_and_sliced.jpg "
+  },
+  {
+    "id": 20,
+    "name": "Cucumber",
+    "description": "1 piece",
+    "price": 15,
+    "category": "vegetables",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Cucurbita_pepo_var._sativus_%28fruit%29.jpg/1200px-Cucurbita_pepo_var._sativus_%28fruit%29.jpg "
+  },
+  {
+    "id": 21,
+    "name": "Bitter Gourd",
+    "description": "1kg",
+    "price": 45,
+    "category": "vegetables",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Bitter_gourd_karela.jpg/1200px-Bitter_gourd_karela.jpg "
+  },
+  {
+    "id": 22,
+    "name": "Radish",
+    "description": "1kg",
+    "price": 25,
+    "category": "vegetables",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Daikon_radish.jpg/1200px-Daikon_radish.jpg "
+  },
+  {
+    "id": 23,
+    "name": "Beetroot",
+    "description": "1kg",
+    "price": 30,
+    "category": "vegetables",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Beets_bundle.jpg/1200px-Beets_bundle.jpg "
+  },
+  {
+    "id": 24,
+    "name": "French Beans",
+    "description": "1kg",
+    "price": 60,
+    "category": "vegetables",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/French_beans_close_up.jpg/1200px-French_beans_close_up.jpg "
+  },
+  {
+    "id": 25,
+    "name": "Garlic",
+    "description": "1kg",
+    "price": 100,
+    "category": "vegetables",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Garlic_bulbs_and_cloves.jpg/1200px-Garlic_bulbs_and_cloves.jpg "
+  },
+  {
+    "id": 26,
+    "name": "Ginger",
+    "description": "1kg",
+    "price": 120,
+    "category": "vegetables",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Ginger_root_at_market.jpg/1200px-Ginger_root_at_market.jpg "
+  },
+  {
+    "id": 27,
+    "name": "Spinach",
+    "description": "1 bunch",
+    "price": 15,
+    "category": "vegetables",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Spinach_on_display_in_a_supermarket.jpg/1200px-Spinach_on_display_in_a_supermarket.jpg "
+  },
+  {
+    "id": 28,
+    "name": "Banana",
+    "description": "1 dozen",
+    "price": 40,
+    "category": "fruits",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Banana_and_cross_section.jpg/1200px-Banana_and_cross_section.jpg "
+  },
+  {
+    "id": 29,
+    "name": "Apple",
+    "description": "1kg",
+    "price": 120,
+    "category": "fruits",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Red_Apple.jpg/1200px-Red_Apple.jpg "
+  },
+  {
+    "id": 30,
+    "name": "Orange",
+    "description": "1kg",
+    "price": 80,
+    "category": "fruits",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Oranges.jpg/1200px-Oranges.jpg "
+  },
+  {
+    "id": 31,
+    "name": "Mango",
+    "description": "1kg",
+    "price": 60,
+    "category": "fruits",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Mangifera_indica_-_mango_fruits.jpg/1200px-Mangifera_indica_-_mango_fruits.jpg "
+  },
+  {
+    "id": 32,
+    "name": "Guava",
+    "description": "1kg",
+    "price": 50,
+    "category": "fruits",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Guava_and_cross_section.jpg/1200px-Guava_and_cross_section.jpg "
+  },
+  {
+    "id": 33,
+    "name": "Grapes",
+    "description": "1kg",
+    "price": 90,
+    "category": "fruits",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Grapes_on_white_background.jpg/1200px-Grapes_on_white_background.jpg "
+  },
+  {
+    "id": 34,
+    "name": "Watermelon",
+    "description": "1 piece",
+    "price": 40,
+    "category": "fruits",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Watermelon_1.jpg/1200px-Watermelon_1.jpg "
+  },
+  {
+    "id": 35,
+    "name": "Papaya",
+    "description": "1kg",
+    "price": 45,
+    "category": "fruits",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Papaya_opened.jpg/1200px-Papaya_opened.jpg "
+  },
+  {
+    "id": 36,
+    "name": "Coconut Water",
+    "description": "1 packet",
+    "price": 20,
+    "category": "beverages",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Coconut_water.jpg/1200px-Coconut_water.jpg "
+  },
+  {
+    "id": 37,
+    "name": "Tea Bags",
+    "description": "1 pack",
+    "price": 50,
+    "category": "beverages",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Teabag_in_teacup.jpg/1200px-Teabag_in_teacup.jpg "
+  },
+  {
+    "id": 38,
+    "name": "Coffee Powder",
+    "description": "1kg",
+    "price": 200,
+    "category": "beverages",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Coffee_powder.jpg/1200px-Coffee_powder.jpg "
+  },
+  {
+    "id": 39,
+    "name": "Salt",
+    "description": "1kg",
+    "price": 20,
+    "category": "spices",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Salt_crystals.jpg/1200px-Salt_crystals.jpg "
+  },
+  {
+    "id": 40,
+    "name": "Sugar",
+    "description": "1kg",
+    "price": 45,
+    "category": "spices",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Sugar_refined.jpg/1200px-Sugar_refined.jpg "
+  },
+  {
+    "id": 41,
+    "name": "Turmeric",
+    "description": "1kg",
+    "price": 150,
+    "category": "spices",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Turmeric_powder.jpg/1200px-Turmeric_powder.jpg "
+  },
+  {
+    "id": 42,
+    "name": "Mustard Seeds",
+    "description": "500g",
+    "price": 60,
+    "category": "spices",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Black_mustard_seeds.jpg/1200px-Black_mustard_seeds.jpg "
+  },
+  {
+    "id": 43,
+    "name": "Pepper",
+    "description": "1kg",
+    "price": 500,
+    "category": "spices",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Black_pepper_seeds.jpg/1200px-Black_pepper_seeds.jpg "
+  },
+  {
+    "id": 44,
+    "name": "Chili Powder",
+    "description": "500g",
+    "price": 80,
+    "category": "spices",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Chili_powder.jpg/1200px-Chili_powder.jpg "
+  },
+  {
+    "id": 45,
+    "name": "Garam Masala",
+    "description": "500g",
+    "price": 100,
+    "category": "spices",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Garam_masala_spice_mix.jpg/1200px-Garam_masala_spice_mix.jpg "
+  },
+  {
+    "id": 46,
+    "name": "Oil",
+    "description": "1 liter",
+    "price": 150,
+    "category": "cooking essentials",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Olive_oil_in_jug.jpg/1200px-Olive_oil_in_jug.jpg "
+  },
+  {
+    "id": 47,
+    "name": "Ghee",
+    "description": "1kg",
+    "price": 500,
+    "category": "cooking essentials",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Ghee_in_pot.jpg/1200px-Ghee_in_pot.jpg "
+  },
+  {
+    "id": 48,
+    "name": "Wheat Flour",
+    "description": "1kg",
+    "price": 40,
+    "category": "cooking essentials",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Wheat_flour.jpg/1200px-Wheat_flour.jpg "
+  },
+  {
+    "id": 49,
+    "name": "Rice",
+    "description": "1kg",
+    "price": 60,
+    "category": "cooking essentials",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/White_rice.jpg/1200px-White_rice.jpg "
+  },
+  {
+    "id": 50,
+    "name": "Urad Dal",
+    "description": "1kg",
+    "price": 100,
+    "category": "cooking essentials",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Urad_dal.jpg/1200px-Urad_dal.jpg "
   }
 ];
 
